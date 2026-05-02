@@ -1,0 +1,121 @@
+/* Local token overrides for light section */
+.about {
+  background: var(--color-bg-warm);
+  --color-text: #1A1A1A;
+  --color-text-muted: #6B6B6B;
+  --color-border: var(--color-border-light);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.about__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  width: 100%;
+}
+
+/* Photo */
+.about__photo-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.about__photo {
+  width: clamp(240px, 28vw, 360px);
+  height: clamp(300px, 35vw, 450px);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #e8d5c4, #d5c4b4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.about__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about__photo-placeholder {
+  color: #999;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.about__photo-accent {
+  position: absolute;
+  bottom: -16px;
+  right: -16px;
+  width: 80%;
+  height: 80%;
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* Content */
+.about__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.about__heading {
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--color-about-heading);
+}
+
+.about__text {
+  color: var(--color-about-text);
+  font-size: 1.05rem;
+  line-height: 1.9;
+}
+
+/* Stats */
+.about__stats {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stat__number {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--color-gold);
+  line-height: 1;
+}
+
+.stat__label {
+  font-size: 0.875rem;
+  color: var(--color-about-muted);
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .about {
+    align-items: flex-start;
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+  }
+  .about__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .about__stats { justify-content: center; }
+  .about__photo-accent { display: none; }
+}

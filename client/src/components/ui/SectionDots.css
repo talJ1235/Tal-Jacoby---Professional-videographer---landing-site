@@ -1,0 +1,47 @@
+.section-dots {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-sticky);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.section-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* Hover grows only non-active dots */
+.section-dot:not(.section-dot--active):hover {
+  width: 11px;
+  height: 11px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.section-dot--active {
+  width: 13px;
+  height: 13px;
+  background: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.25);
+}
+
+/* Active stays same size on hover */
+.section-dot--active:hover {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 768px) {
+  .section-dots { display: none; }
+}
