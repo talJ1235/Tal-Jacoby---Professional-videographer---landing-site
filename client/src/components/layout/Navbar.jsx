@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { scrollToSection } from '../../utils/smoothScroll';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -39,7 +40,7 @@ export function Navbar() {
   const handleNav = (href) => {
     setMenuOpen(false);
     const id = href.replace('#', '');
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    scrollToSection(id);
   };
 
   return (
@@ -51,8 +52,8 @@ export function Navbar() {
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
       >
         <div className="navbar__inner">
-          <a className="navbar__logo" href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} aria-label="טל יעקבי — דף הבית">
-            <img src="/logo.png" alt="טל יעקבי" className="navbar__logo-img" />
+          <a className="navbar__logo" href="#" onClick={(e) => { e.preventDefault(); scrollToSection('hero'); }} aria-label="טל יעקבי — דף הבית">
+            <img src="/logo-navbar.png" alt="טל יעקבי" className="navbar__logo-img" />
           </a>
 
           <ul className="navbar__links">

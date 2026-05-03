@@ -1,8 +1,34 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+.vercel/
+
+# Environment — לעולם לא להעלות secrets אמיתיים
 .env
+.env.local
+.env.production
+.env.*.local
+
+# Database
 *.db
 *.db-journal
+
+# Claude Code workspace
+.claude/
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Logs
 *.log
+npm-debug.log*
+
+# IDE
+.vscode/settings.json
+
+# קבצי תמונה זמניים בשורש
+*.png.png
+favicon.png.png

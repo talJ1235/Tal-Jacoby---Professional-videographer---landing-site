@@ -34,11 +34,10 @@
 .navbar__logo:hover { opacity: 0.85; }
 
 .navbar__logo-img {
-  height: 30px;
+  height: 42px;
   width: auto;
-  /* logo is black on white — invert makes it white on transparent-looking dark bg */
-  filter: invert(1);
   display: block;
+  filter: brightness(0) invert(1); /* הופך את הלוגו ללבן על נאבבר כהה */
 }
 
 .navbar__links {
