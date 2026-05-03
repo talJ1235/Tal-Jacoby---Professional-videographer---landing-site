@@ -1,10 +1,15 @@
+/* ── Navbar height variable (16px top + 38px logo + 16px bottom) ── */
+:root { --navbar-h: 70px; }
+
 .portfolio {
   background: var(--color-bg-alt);
   height: 100vh;
+  padding-top: var(--navbar-h);   /* push grid below fixed navbar */
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-/* 4-column × 3-row grid — 6 items */
+/* 4-column × 3-row grid fills the remaining viewport */
 .collage-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -31,12 +36,12 @@
 .collage-item:nth-child(5) { grid-column: 4 / 5; grid-row: 2 / 3; }
 .collage-item:nth-child(6) { grid-column: 1 / 5; grid-row: 3 / 4; } /* full-width banner */
 
-/* Item */
+/* ── Item ── */
 .collage-item {
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  background: var(--color-bg-subtle);
+  background: #111;
 }
 
 .collage-thumb {
@@ -44,8 +49,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.5s var(--ease-smooth), opacity 0.3s ease;
-  opacity: 0.8;
+  transition: transform 0.55s var(--ease-smooth), opacity 0.3s ease;
+  opacity: 0.75;
 }
 
 .collage-thumb--placeholder {
@@ -53,11 +58,11 @@
 }
 
 .collage-item:hover .collage-thumb {
-  transform: scale(1.06);
+  transform: scale(1.05);
   opacity: 1;
 }
 
-/* Overlay */
+/* ── Overlay ── */
 .collage-overlay {
   position: absolute;
   inset: 0;
@@ -69,22 +74,25 @@
 }
 
 .collage-item:hover .collage-overlay {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.38);
 }
 
+/* Play button */
 .collage-play {
-  width: 54px;
-  height: 54px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  background: var(--color-gold);
+  background: rgba(255, 107, 74, 0.92);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   opacity: 0;
-  transform: scale(0.6);
+  transform: scale(0.55);
   transition: opacity 0.3s ease, transform 0.3s ease;
-  padding-right: 3px;
+  padding-right: 4px;
+  flex-shrink: 0;
 }
 
 .collage-item:hover .collage-play {
@@ -92,11 +100,33 @@
   transform: scale(1);
 }
 
+/* Title on hover */
+.collage-title {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  padding: 28px 14px 12px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.82));
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: right;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.collage-item:hover .collage-title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ── Lightbox ── */
 .lightbox {
   padding: var(--space-4);
-  max-height: 90vh;
-  overflow-y: auto;
 }
 
 .lightbox__video {
@@ -118,14 +148,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 80vh;
-  overflow: hidden;
   border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
 .lightbox__image img {
   max-width: 100%;
-  max-height: 80vh;
+  max-height: 82vh;
   object-fit: contain;
   border-radius: var(--radius-md);
   display: block;
@@ -137,6 +166,7 @@
     height: auto;
     min-height: unset;
     overflow: visible;
+    padding-top: 0;     /* no navbar offset needed — sections scroll freely */
     padding-bottom: 3px;
   }
 
@@ -148,24 +178,21 @@
     gap: 3px;
   }
 
-  /* Reset all explicit placements */
-  .collage-item:nth-child(n) {
-    grid-column: auto;
-    grid-row: auto;
-  }
+  /* Reset desktop placements */
+  .collage-item:nth-child(n) { grid-column: auto; grid-row: auto; }
 
-  /* First item: full-width hero */
+  /* Item 1: full-width cinematic banner */
   .collage-item:nth-child(1) {
     grid-column: 1 / 3;
     aspect-ratio: 16 / 7;
   }
 
-  /* Items 2-5: 2-column squares */
+  /* Items 2-5: square grid */
   .collage-item:nth-child(n+2):nth-child(-n+5) {
     aspect-ratio: 1 / 1;
   }
 
-  /* Last item (Drive video): full-width banner */
+  /* Item 6: full-width banner */
   .collage-item:nth-child(6) {
     grid-column: 1 / 3;
     aspect-ratio: 16 / 7;
@@ -180,21 +207,23 @@
     inset: 0;
   }
 
-  /* Show play icon always on mobile (no hover) */
+  /* Always show play icon on mobile */
   .collage-item .collage-play {
-    opacity: 0.85;
+    opacity: 0.9;
     transform: scale(0.8);
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
   }
 
   .collage-item .collage-overlay {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.18);
   }
 
-  /* Keep items properly sized using padding trick */
-  .collage-item {
-    position: relative;
-    overflow: hidden;
+  /* Always show titles on mobile */
+  .collage-title {
+    opacity: 1;
+    transform: translateY(0);
+    font-size: 0.75rem;
+    padding: 22px 10px 8px;
   }
 }

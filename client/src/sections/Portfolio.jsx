@@ -36,13 +36,29 @@ const PORTFOLIO_ITEMS = [
 // ── helpers ──────────────────────────────────────────────────
 function getThumbSrc(item) {
   if (item.type === 'youtube') {
-    return `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg`;
+    // maxresdefault = 1280×720 — highest quality
+    return `https://img.youtube.com/vi/${item.youtubeId}/maxresdefault.jpg`;
   }
   if (item.type === 'drive-image' || item.type === 'drive-video') {
-    // works for both images and videos in Drive
-    return `https://drive.google.com/thumbnail?id=${item.driveId}&sz=w800`;
+    return `https://drive.google.com/thumbnail?id=${item.driveId}&sz=w1200`;
   }
   return item.thumbnail || null;
+}
+
+// Fallback chain: maxresdefault → sddefault → hqdefault
+function handleThumbError(e, item) {
+  const src = e.currentTarget.src;
+  if (item.type === 'youtube') {
+    if (src.includes('maxresdefault')) {
+      e.currentTarget.src = `https://img.youtube.com/vi/${item.youtubeId}/sddefault.jpg`;
+      return;
+    }
+    if (src.includes('sddefault')) {
+      e.currentTarget.src = `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg`;
+      return;
+    }
+  }
+  e.currentTarget.style.display = 'none';
 }
 
 function isVideoType(item) {
@@ -114,9 +130,7 @@ export function Portfolio() {
                   alt={item.title || ''}
                   className="collage-thumb"
                   loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
+                  onError={(e) => handleThumbError(e, item)}
                 />
               ) : (
                 <div className="collage-thumb collage-thumb--placeholder" />
@@ -125,12 +139,16 @@ export function Portfolio() {
               <div className="collage-overlay">
                 {isVid && (
                   <div className="collage-play">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                       <polygon points="5,3 19,12 5,21" />
                     </svg>
                   </div>
                 )}
               </div>
+
+              {item.title && (
+                <div className="collage-title">{item.title}</div>
+              )}
             </div>
           );
         })}
