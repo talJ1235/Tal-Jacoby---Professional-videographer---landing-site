@@ -25,14 +25,12 @@ import './Portfolio.css';
 //  title: כותרת שמוצגת ב-hover
 // ============================================================
 const PORTFOLIO_ITEMS = [
-  { id: 1, type: 'youtube',     youtubeId: 'REPLACE_ME', title: 'שם הסרטון 1' },
-  { id: 2, type: 'youtube',     youtubeId: 'REPLACE_ME', title: 'שם הסרטון 2' },
-  { id: 3, type: 'youtube',     youtubeId: 'REPLACE_ME', title: 'שם הסרטון 3' },
-  { id: 4, type: 'youtube',     youtubeId: 'REPLACE_ME', title: 'שם הסרטון 4' },
-  { id: 5, type: 'drive-image', driveId:   'REPLACE_ME', title: 'שם התמונה 1' },
-  { id: 6, type: 'drive-image', driveId:   'REPLACE_ME', title: 'שם התמונה 2' },
-  { id: 7, type: 'drive-video', driveId:   'REPLACE_ME', title: 'שם הוידאו 1' },
-  { id: 8, type: 'drive-video', driveId:   'REPLACE_ME', title: 'שם הוידאו 2' },
+  { id: 1, type: 'youtube',     youtubeId: '-H7ayDWN7_I',                    title: 'סרטון סיכום תחרות רובוטיקה' },
+  { id: 2, type: 'youtube',     youtubeId: 'tfmJEt6jmHs',                    title: 'סרטון חשיפת רובוט 2025' },
+  { id: 3, type: 'youtube',     youtubeId: 'Zx6IR0Up-A0',                    title: 'סרטון 3' },
+  { id: 4, type: 'youtube',     youtubeId: 'ZS07lZFwtqk',                    title: 'סרטון 4' },
+  { id: 5, type: 'youtube',     youtubeId: 'BIfYAqC7K9A',                    title: 'סרטון 5' },
+  { id: 6, type: 'drive-video', driveId:   '1BK6NiUwKgHCCx6BpfqJD0u9J2n0Goy9r', title: 'סרטון תדמית לפרויקט גמר באלקטרוניקה' },
 ];
 
 // ── helpers ──────────────────────────────────────────────────
