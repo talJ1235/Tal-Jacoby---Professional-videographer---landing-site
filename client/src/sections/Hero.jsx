@@ -52,7 +52,7 @@ export function Hero() {
             צלם וידאו
           </motion.p>
           <motion.p className="hero__tagline" {...fadeUp(0.6)}>
-            מספר סיפורים דרך עדשה — חתונות, אירועים, תדמית עסקית
+            מספר סיפורים דרך עדשה — אירועים, תדמית עסקית, רגעים שנשארים לנצח
           </motion.p>
           <motion.div className="hero__ctas" {...fadeUp(0.75)}>
             <Button size="lg" onClick={() => scrollTo('portfolio')}>

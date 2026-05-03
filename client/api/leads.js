@@ -49,7 +49,7 @@ async function sendEmails(lead) {
         html: `<div dir="rtl" style="font-family:Arial">
           <h2>שלום ${lead.name},</h2>
           <p>תודה על פנייתך! קיבלתי את הפרטים ואחזור אליך בהקדם.</p>
-          <p>בברכה,<br><strong>טל יעקבי — צלם וידאוגרף</strong></p>
+          <p>בברכה,<br><strong>טל יעקבי — צלם וידאו</strong></p>
         </div>`,
       }),
     ]);

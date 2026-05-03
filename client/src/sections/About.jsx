@@ -75,8 +75,8 @@ export function About() {
           </motion.h2>
 
           <motion.p className="about__text" {...fadeUp} transition={{ duration: 0.7, delay: 0.2 }}>
-            שלום! אני טל יעקבי, צלם ווידאוגרף פרילנסר עם ניסיון של מעל 5 שנים.
-            מתמחה בצילום חתונות, אירועים, ווידאו תדמית לעסקים.
+            שלום! אני טל יעקבי, צלם וידאו פרילנסר עם ניסיון של מעל 5 שנים.
+            מתמחה בצילום אירועים, וידאו תדמית לעסקים ותוכן מקצועי.
           </motion.p>
 
           <motion.p className="about__text" {...fadeUp} transition={{ duration: 0.7, delay: 0.3 }}>
