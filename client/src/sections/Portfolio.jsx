@@ -35,14 +35,15 @@ const PORTFOLIO_ITEMS = [
 
 // ── helpers ──────────────────────────────────────────────────
 function getThumbSrc(item) {
+  // Custom thumbnail overrides everything
+  if (item.thumbnail) return item.thumbnail;
   if (item.type === 'youtube') {
-    // maxresdefault = 1280×720 — highest quality
     return `https://img.youtube.com/vi/${item.youtubeId}/maxresdefault.jpg`;
   }
   if (item.type === 'drive-image' || item.type === 'drive-video') {
     return `https://drive.google.com/thumbnail?id=${item.driveId}&sz=w1200`;
   }
-  return item.thumbnail || null;
+  return null;
 }
 
 // Fallback chain: maxresdefault → sddefault → hqdefault

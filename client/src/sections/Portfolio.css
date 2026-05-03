@@ -9,10 +9,10 @@
   box-sizing: border-box;
 }
 
-/* 4-column × 3-row grid fills the remaining viewport */
+/* 3-column × 3-row balanced bento grid */
 .collage-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 2fr 1fr 1fr;
   grid-template-rows: repeat(3, 1fr);
   gap: 3px;
   height: 100%;
@@ -21,20 +21,21 @@
 
 /*
   Layout:
-  ┌──────────┬──────┬──────┐
-  │          │  2   │  3   │
-  │    1     ├──────┼──────┤
-  │  (big)   │  4   │  5   │
-  ├──────────┴──────┴──────┤
-  │         6  (wide)      │
-  └────────────────────────┘
+  ┌───────────┬──────┬──────┐
+  │           │  2   │  3   │
+  │     1     ├──────┼──────┤
+  │  (large)  │  4   │  5   │
+  ├─────┬─────┴──────┴──────┤  ← row 3 equal thirds
+  │  ←  │        6          │
+  └─────┴───────────────────┘
+  Actually: 4,5 mid-right; 6 spans cols 2-3 row 3; 7 not used
 */
-.collage-item:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3; } /* big feature */
-.collage-item:nth-child(2) { grid-column: 3 / 4; grid-row: 1 / 2; }
-.collage-item:nth-child(3) { grid-column: 4 / 5; grid-row: 1 / 2; }
-.collage-item:nth-child(4) { grid-column: 3 / 4; grid-row: 2 / 3; }
-.collage-item:nth-child(5) { grid-column: 4 / 5; grid-row: 2 / 3; }
-.collage-item:nth-child(6) { grid-column: 1 / 5; grid-row: 3 / 4; } /* full-width banner */
+.collage-item:nth-child(1) { grid-column: 1 / 2; grid-row: 1 / 3; } /* big tall feature */
+.collage-item:nth-child(2) { grid-column: 2 / 3; grid-row: 1 / 2; }
+.collage-item:nth-child(3) { grid-column: 3 / 4; grid-row: 1 / 2; }
+.collage-item:nth-child(4) { grid-column: 2 / 3; grid-row: 2 / 3; }
+.collage-item:nth-child(5) { grid-column: 3 / 4; grid-row: 2 / 3; }
+.collage-item:nth-child(6) { grid-column: 1 / 4; grid-row: 3 / 4; } /* full-width bottom */
 
 /* ── Item ── */
 .collage-item {

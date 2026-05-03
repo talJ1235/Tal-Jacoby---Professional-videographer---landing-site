@@ -66,8 +66,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;   /* RTL: flex-start = visual RIGHT */
-  padding-right: clamp(var(--space-8), 5vw, var(--space-16));
-  padding-left: 56%;             /* leave slightly more room for photo */
+  padding-right: clamp(var(--space-8), 4vw, var(--space-12));
+  padding-left: min(56%, 780px); /* cap so wide screens don't squeeze text */
   padding-top: 70px;             /* navbar height */
 }
 
@@ -86,6 +86,7 @@
   color: var(--color-gold);
   line-height: 1.05;
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .hero__title {
@@ -95,6 +96,7 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.14em;
+  white-space: nowrap;
 }
 
 .hero__tagline {

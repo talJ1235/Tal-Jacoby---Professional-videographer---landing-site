@@ -25,36 +25,46 @@ async function sendEmails(lead) {
     console.log('RESEND_API_KEY not set — skipping email');
     return;
   }
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+  const notifyTo = process.env.NOTIFICATION_EMAIL || 'tal.jacoby1235@gmail.com';
+
+  // Send notification email — always to owner
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await Promise.all([
-      resend.emails.send({
-        from: process.env.RESEND_FROM || 'onboarding@resend.dev',
-        to:   process.env.NOTIFICATION_EMAIL || 'tal.jacoby1235@gmail.com',
-        subject: `ליד חדש: ${lead.name}`,
-        html: `<div dir="rtl" style="font-family:Arial">
-          <h2>ליד חדש התקבל!</h2>
-          <p><strong>שם:</strong> ${lead.name}</p>
-          <p><strong>טלפון:</strong> ${lead.phone}</p>
-          <p><strong>אימייל:</strong> ${lead.email}</p>
-          <p><strong>שירות:</strong> ${lead.service}</p>
-          ${lead.message ? `<p><strong>הודעה:</strong> ${lead.message}</p>` : ''}
-          <p><strong>תאריך:</strong> ${new Date(lead.created_at).toLocaleString('he-IL')}</p>
-        </div>`,
-      }),
-      resend.emails.send({
-        from: process.env.RESEND_FROM || 'onboarding@resend.dev',
-        to:   lead.email,
-        subject: 'קיבלתי את פנייתך — טל יעקבי',
-        html: `<div dir="rtl" style="font-family:Arial">
-          <h2>שלום ${lead.name},</h2>
-          <p>תודה על פנייתך! קיבלתי את הפרטים ואחזור אליך בהקדם.</p>
-          <p>בברכה,<br><strong>טל יעקבי — צלם וידאו</strong></p>
-        </div>`,
-      }),
-    ]);
+    await resend.emails.send({
+      from,
+      to: notifyTo,
+      subject: `ליד חדש: ${lead.name}`,
+      html: `<div dir="rtl" style="font-family:Arial">
+        <h2>ליד חדש התקבל!</h2>
+        <p><strong>שם:</strong> ${lead.name}</p>
+        <p><strong>טלפון:</strong> ${lead.phone}</p>
+        <p><strong>אימייל:</strong> ${lead.email}</p>
+        <p><strong>שירות:</strong> ${lead.service}</p>
+        ${lead.message ? `<p><strong>הודעה:</strong> ${lead.message}</p>` : ''}
+        <p><strong>תאריך:</strong> ${new Date(lead.created_at).toLocaleString('he-IL')}</p>
+      </div>`,
+    });
+    console.log('Notification email sent OK');
   } catch (err) {
-    console.error('Email error:', err.message);
+    console.error('Notification email error:', err.message);
+  }
+
+  // Send auto-reply to customer (may fail on free tier for non-verified recipients)
+  try {
+    await resend.emails.send({
+      from,
+      to: lead.email,
+      subject: 'קיבלתי את פנייתך — טל יעקבי',
+      html: `<div dir="rtl" style="font-family:Arial">
+        <h2>שלום ${lead.name},</h2>
+        <p>תודה על פנייתך! קיבלתי את הפרטים ואחזור אליך בהקדם.</p>
+        <p>בברכה,<br><strong>טל יעקבי — צלם וידאו</strong></p>
+      </div>`,
+    });
+    console.log('Auto-reply sent OK');
+  } catch (err) {
+    console.error('Auto-reply email error:', err.message);
   }
 }
 

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { useLeads } from '../hooks/useLeads';
-import { exportCsv } from '../services/api';
+import { getLeads } from '../services/api';
 import { formatDate } from '../utils';
 import './Admin.css';
 
@@ -101,14 +102,31 @@ export function Admin() {
 
   const handleExport = async () => {
     try {
-      const { data } = await exportCsv(PASSWORD);
-      const url = URL.createObjectURL(new Blob([data], { type: 'text/csv;charset=utf-8' }));
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'leads.csv';
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
+      // Fetch all leads (no pagination)
+      const { data } = await getLeads(PASSWORD, { page: 1 });
+      const all = data.leads || [];
+
+      const rows = all.map((l) => ({
+        'שם':       l.name,
+        'טלפון':    l.phone,
+        'אימייל':   l.email,
+        'שירות':    l.service,
+        'סטטוס':    l.status,
+        'הודעה':    l.message || '',
+        'הערות':    l.notes || '',
+        'תאריך':    formatDate(l.created_at),
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows, { skipHeader: false });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'לידים');
+
+      // RTL support for Excel
+      ws['!cols'] = [14,14,22,16,10,28,28,14].map(wch => ({ wch }));
+
+      XLSX.writeFile(wb, 'leads.xlsx');
+    } catch (e) {
+      console.error(e);
       alert('שגיאה בייצוא');
     }
   };
@@ -145,7 +163,7 @@ export function Admin() {
             <option value="">כל הסטטוסים</option>
             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
-          <Button variant="outline" size="sm" onClick={handleExport}>ייצוא CSV</Button>
+          <Button variant="outline" size="sm" onClick={handleExport}>ייצוא Excel ⬇</Button>
         </div>
 
         {loading && <p className="admin-loading">טוען...</p>}
