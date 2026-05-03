@@ -41,20 +41,12 @@ export function Hero() {
         {/* Photo column */}
         <motion.div
           className="hero__photo-wrap"
-          initial={{ opacity: 0, scale: 0.85 }}
+          initial={{ opacity: 0, scale: 0.88 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
         >
-          <div className="hero__photo hero-photo-ring">
-            <img src="/hero-photo.png" alt="טל יעקבי" />
-          </div>
-
-          <div className="hero__badge float-badge">
-            <span>📷</span> צילום
-          </div>
-          <div className="hero__badge hero__badge--bottom float-badge">
-            <span>🎬</span> וידאו
-          </div>
+          <img src="/hero-circle.png" alt="" className="hero__circle-bg" aria-hidden="true" />
+          <img src="/hero-photo.png" alt="טל יעקבי" className="hero__photo-img" />
         </motion.div>
       </div>
 
