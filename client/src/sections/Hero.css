@@ -20,9 +20,9 @@
 /* Circle wrapper — handles CSS centering so Framer Motion can't break it */
 .hero__circle-wrap {
   position: absolute;
-  width: 90%;
-  top: -8%;
-  left: 50%;
+  width: 112%;                    /* bigger circle */
+  top: 4%;                        /* vertically aligned with face/torso */
+  left: 62%;                      /* shifted right to center between edges */
   transform: translateX(-50%);
   z-index: 0;
 }
@@ -38,9 +38,9 @@
 .hero__photo-wrap {
   position: absolute;
   bottom: 0;
-  left: 50%;
+  left: 62%;                      /* shifted right, centered in visual half */
   transform: translateX(-50%);
-  height: 106%;
+  height: 84%;                    /* smaller so head is fully visible */
   width: auto;
   z-index: 1;
   pointer-events: none;
