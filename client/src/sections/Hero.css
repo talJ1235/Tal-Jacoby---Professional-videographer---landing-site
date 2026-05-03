@@ -10,7 +10,7 @@
   background: var(--color-bg);
 }
 
-/* Subtle radial glow behind photo */
+/* Subtle radial glow */
 .hero::after {
   content: '';
   position: absolute;
@@ -146,13 +146,68 @@
 }
 .hero__scroll:hover { opacity: 0.8; }
 
+/* ── Tablet ── */
 @media (max-width: 900px) {
   .hero__inner {
     flex-direction: column-reverse;
     text-align: center;
-    gap: var(--space-12);
+    gap: var(--space-10);
   }
   .hero__tagline { margin: 0 auto; }
   .hero__ctas { justify-content: center; }
   .hero__badge { display: none; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .hero {
+    padding: 80px var(--space-5) var(--space-12);
+    min-height: 100svh; /* safe area aware */
+    justify-content: center;
+  }
+
+  .hero__inner {
+    flex-direction: column;        /* text first on mobile, then photo */
+    gap: var(--space-8);
+    text-align: center;
+  }
+
+  .hero__photo {
+    width: 180px;
+    height: 180px;
+  }
+
+  .hero__name {
+    font-size: clamp(2.4rem, 10vw, 3.2rem);
+  }
+
+  .hero__title {
+    font-size: 0.95rem;
+    letter-spacing: 0.18em;
+  }
+
+  .hero__tagline {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    max-width: 100%;
+  }
+
+  .hero__ctas {
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    justify-content: center;
+  }
+
+  /* Make buttons full-width on small screens */
+  .hero__ctas .btn {
+    flex: 1;
+    min-width: 130px;
+    justify-content: center;
+    padding: 14px var(--space-4);
+    font-size: 0.95rem;
+  }
+
+  .hero__scroll {
+    bottom: var(--space-5);
+  }
 }

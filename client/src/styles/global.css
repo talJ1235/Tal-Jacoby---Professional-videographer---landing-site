@@ -11,9 +11,8 @@ html {
   font-size: 16px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html { scroll-behavior: smooth; }
-}
+/* Remove browser smooth-scroll — our custom RAF scroll handles it on desktop */
+html { scroll-behavior: auto; }
 
 body {
   font-family: var(--font-body);
@@ -68,9 +67,9 @@ body::before {
   opacity: 0.4;
 }
 
-/* GPU hint לסקשנים — מאיץ אנימציות scroll */
-section {
-  will-change: transform;
+/* GPU hint for sections — desktop only (causes compositing issues on mobile) */
+@media (min-width: 769px) {
+  section { will-change: transform; }
 }
 
 /* Section base */
@@ -82,6 +81,16 @@ section {
 
 .section-full {
   padding: var(--space-24) var(--space-6);
+}
+
+/* Mobile section padding */
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-12) var(--space-5);
+  }
+  .section-full {
+    padding: var(--space-12) var(--space-5);
+  }
 }
 
 /* Scrollbar — hidden on desktop (section-scroll only), visible on mobile */

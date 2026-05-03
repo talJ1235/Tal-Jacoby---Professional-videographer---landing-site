@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
+import { scrollToSection } from '../utils/smoothScroll';
 import './Hero.css';
 
 const fadeUp = (delay = 0) => ({
@@ -11,7 +12,7 @@ const fadeUp = (delay = 0) => ({
 export function Hero() {
   const whatsapp = import.meta.env.VITE_WHATSAPP_NUMBER || '972500000000';
 
-  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  const scrollTo = (id) => scrollToSection(id);
 
   return (
     <section id="hero" className="hero">

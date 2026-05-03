@@ -34,10 +34,10 @@
 .navbar__logo:hover { opacity: 0.85; }
 
 .navbar__logo-img {
-  height: 42px;
+  height: 38px;
   width: auto;
   display: block;
-  filter: brightness(0) invert(1); /* הופך את הלוגו ללבן על נאבבר כהה */
+  filter: brightness(0) invert(1);
 }
 
 .navbar__links {
@@ -125,6 +125,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   z-index: var(--z-overlay);
+  backdrop-filter: blur(4px);
 }
 
 .drawer {
@@ -132,29 +133,32 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 280px;
-  background: #0a0a0a;
+  width: min(300px, 85vw);
+  background: #0d0d0d;
   border-left: 1px solid rgba(255, 255, 255, 0.08);
   z-index: calc(var(--z-overlay) + 1);
   padding: var(--space-8) var(--space-6);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .drawer__close {
   align-self: flex-start;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 1.2rem;
-  margin-bottom: var(--space-8);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.3rem;
+  margin-bottom: var(--space-6);
   cursor: pointer;
+  padding: var(--space-2);
   transition: color var(--duration-fast);
+  line-height: 1;
 }
 
 .drawer__close:hover { color: white; }
 
 .drawer__logo {
   font-family: var(--font-heading);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: var(--color-gold);
   margin-bottom: var(--space-8);
 }
@@ -162,26 +166,43 @@
 .drawer__links {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: 0;
 }
 
 .drawer__link {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 500;
   transition: color var(--duration-fast);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: var(--space-4);
+  padding: var(--space-4) 0;
+  display: block;
 }
 
 .drawer__link:hover { color: var(--color-gold); }
 
-@media (max-width: 768px) {
-  .navbar__links { display: none; }
-  .navbar__wa { display: none; }
-  .navbar__burger { display: flex; }
-}
-
 .drawer__link--wa {
   color: #2ecc71 !important;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: 10px;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(46, 204, 113, 0.07);
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: var(--space-3) var(--space-5);
+  }
+  .navbar__links { display: none; }
+  .navbar__wa    { display: none; }
+  .navbar__burger { display: flex; }
+
+  .navbar__logo-img {
+    height: 32px;
+  }
 }
