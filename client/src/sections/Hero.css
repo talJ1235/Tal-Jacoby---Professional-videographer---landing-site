@@ -13,28 +13,29 @@
   width: 54%;
   height: 100%;
   z-index: 1;
+  overflow: hidden;              /* clip photo within left half */
   pointer-events: none;
 }
 
-/* Circle sits in the upper portion of the visual block */
+/* Circle — positioned at upper body / face area */
 .hero__circle-bg {
   position: absolute;
-  width: 88%;
+  width: 90%;
   height: auto;
-  top: 50%;
+  top: -8%;                      /* starts above the block = circle shows from top */
   left: 50%;
-  transform: translate(-50%, -54%);
+  transform: translateX(-50%);
   z-index: 0;
   user-select: none;
 }
 
-/* Photo fills full height, overflows slightly at bottom */
+/* Photo fills full height, anchored to bottom */
 .hero__photo-img {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  height: 104%;           /* slightly taller than container — creates bottom overflow effect */
+  height: 106%;
   width: auto;
   max-width: none;
   z-index: 1;
@@ -54,9 +55,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;   /* RTL: flex-start = visual RIGHT */
-  /* Leave the left 54% for the photo */
-  padding-right: clamp(var(--space-8), 5vw, var(--space-24));
-  padding-left: 54%;
+  padding-right: clamp(var(--space-8), 5vw, var(--space-16));
+  padding-left: 56%;             /* leave slightly more room for photo */
   padding-top: 70px;             /* navbar height */
 }
 
