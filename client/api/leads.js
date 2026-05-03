@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { Resend } from 'resend';
 
 const getDb = () => neon(process.env.DATABASE_URL);
 
@@ -20,9 +21,11 @@ async function initTable(sql) {
 }
 
 async function sendEmails(lead) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.RESEND_API_KEY) {
+    console.log('RESEND_API_KEY not set — skipping email');
+    return;
+  }
   try {
-    const { Resend } = await import('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
     await Promise.all([
       resend.emails.send({
