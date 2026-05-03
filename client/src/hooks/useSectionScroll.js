@@ -32,13 +32,16 @@ function animateScroll(targetY, duration, onDone) {
   return () => cancelAnimationFrame(rafId);
 }
 
-// מחשב את הסקשן הנוכחי לפי מיקום גלילה אמיתי — אמין יותר מ-IntersectionObserver
+// מחשב את הסקשן הנוכחי לפי מיקום גלילה אמיתי
+// משתמש ב-getBoundingClientRect כמו getSectionTop — עקביות מלאה
 function getCurrentSectionIndex() {
-  const mid = window.scrollY + window.innerHeight * 0.4;
+  const scrollMid = window.scrollY + window.innerHeight * 0.5;
   let current = 0;
   for (let i = 0; i < SECTION_IDS.length; i++) {
     const el = document.getElementById(SECTION_IDS[i]);
-    if (el && el.offsetTop <= mid) current = i;
+    if (!el) continue;
+    const sectionTop = el.getBoundingClientRect().top + window.scrollY;
+    if (sectionTop <= scrollMid) current = i;
   }
   return current;
 }
