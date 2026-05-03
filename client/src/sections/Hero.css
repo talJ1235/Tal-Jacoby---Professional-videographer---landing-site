@@ -17,28 +17,39 @@
   pointer-events: none;
 }
 
-/* Circle — positioned at upper body / face area */
-.hero__circle-bg {
+/* Circle wrapper — handles CSS centering so Framer Motion can't break it */
+.hero__circle-wrap {
   position: absolute;
   width: 90%;
-  height: auto;
-  top: -8%;                      /* starts above the block = circle shows from top */
+  top: -8%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 0;
+}
+
+.hero__circle-bg {
+  display: block;
+  width: 100%;
+  height: auto;
   user-select: none;
 }
 
-/* Photo fills full height, anchored to bottom */
-.hero__photo-img {
+/* Photo wrapper — handles CSS centering so Framer Motion can't break it */
+.hero__photo-wrap {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   height: 106%;
   width: auto;
-  max-width: none;
   z-index: 1;
+  pointer-events: none;
+}
+
+.hero__photo-img {
+  height: 100%;
+  width: auto;
+  max-width: none;
   display: block;
   filter: drop-shadow(0 16px 48px rgba(0, 0, 0, 0.55));
   pointer-events: auto;
@@ -135,15 +146,14 @@
     margin-top: 80px;          /* below navbar */
   }
 
-  .hero__circle-bg {
+  .hero__circle-wrap {
     width: 70%;
     top: 50%;
     transform: translate(-50%, -50%);
   }
 
-  .hero__photo-img {
+  .hero__photo-wrap {
     height: 115%;
-    bottom: 0;
   }
 
   .hero__inner {

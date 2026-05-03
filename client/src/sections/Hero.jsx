@@ -17,25 +17,29 @@ export function Hero() {
 
       {/* ── Visual: circle + photo, absolutely positioned ── */}
       <div className="hero__visual">
-        {/* Circle fades in first, slides in from the left */}
-        <motion.img
-          src="/hero-circle.png"
-          alt=""
-          className="hero__circle-bg"
-          aria-hidden="true"
-          initial={{ opacity: 0, x: -60 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
-        />
-        {/* Photo fades in second, same direction */}
-        <motion.img
-          src="/hero-photo.png"
-          alt="טל יעקבי"
-          className="hero__photo-img"
-          initial={{ opacity: 0, x: -60 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.95, delay: 0.7, ease: [0.4, 0, 0.2, 1] }}
-        />
+        {/* Wrapper holds CSS centering; motion.img only handles animation */}
+        <div className="hero__circle-wrap">
+          <motion.img
+            src="/hero-circle.png"
+            alt=""
+            className="hero__circle-bg"
+            aria-hidden="true"
+            initial={{ opacity: 0, x: -60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
+          />
+        </div>
+        {/* Wrapper holds CSS centering; motion.img only handles animation */}
+        <div className="hero__photo-wrap">
+          <motion.img
+            src="/hero-photo.png"
+            alt="טל יעקבי"
+            className="hero__photo-img"
+            initial={{ opacity: 0, x: -60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.95, delay: 0.7, ease: [0.4, 0, 0.2, 1] }}
+          />
+        </div>
       </div>
 
       {/* ── Text — right side (RTL start) ── */}
