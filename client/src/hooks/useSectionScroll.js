@@ -1,10 +1,9 @@
 import { useEffect, useRef } from 'react';
 
 const SECTION_IDS = ['hero', 'about', 'portfolio', 'contact'];
-const DURATION    = 1200; // ms
-const POST_LOCK   = 300;  // ms אחרי סיום — חלון מת שמונע wheel עודף
+const DURATION    = 950;  // ms
+const POST_LOCK   = 320;  // ms חלון מת אחרי סיום — מונע wheel שהצטבר
 
-// easeOutExpo — מתחיל מהיר, עוצר רכות
 function easeOutExpo(t) {
   return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
 }
@@ -33,26 +32,24 @@ function animateScroll(targetY, duration, onDone) {
   return () => cancelAnimationFrame(rafId);
 }
 
+// מחשב את הסקשן הנוכחי לפי מיקום גלילה אמיתי — אמין יותר מ-IntersectionObserver
+function getCurrentSectionIndex() {
+  const mid = window.scrollY + window.innerHeight * 0.4;
+  let current = 0;
+  for (let i = 0; i < SECTION_IDS.length; i++) {
+    const el = document.getElementById(SECTION_IDS[i]);
+    if (el && el.offsetTop <= mid) current = i;
+  }
+  return current;
+}
+
 export function useSectionScroll() {
-  const activeRef   = useRef(0);
   const lockRef     = useRef(false);
   const cancelRef   = useRef(null);
   const lastFireRef = useRef(0);
 
   useEffect(() => {
     if (window.innerWidth <= 768) return;
-
-    // IntersectionObserver — מסנכרן activeRef גם בניווט מהתפריט
-    const observers = SECTION_IDS.map((id, i) => {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) activeRef.current = i; },
-        { threshold: 0.5 }
-      );
-      obs.observe(el);
-      return obs;
-    });
 
     const getSectionTop = (index) => {
       const el = document.getElementById(SECTION_IDS[index]);
@@ -65,7 +62,6 @@ export function useSectionScroll() {
       if (targetY === null) return;
 
       cancelRef.current?.();
-      activeRef.current   = index;
       lockRef.current     = true;
       lastFireRef.current = performance.now();
 
@@ -76,28 +72,28 @@ export function useSectionScroll() {
 
     const onWheel = (e) => {
       e.preventDefault();
-
       if (lockRef.current) return;
 
       const now = performance.now();
-      if (now - lastFireRef.current < DURATION * 0.25) return;
+      if (now - lastFireRef.current < POST_LOCK) return;
 
-      const dir = e.deltaY > 0 ? 1 : -1;
+      const dir     = e.deltaY > 0 ? 1 : -1;
+      const current = getCurrentSectionIndex(); // ← תמיד מחשב מחדש מה-DOM
+      const next    = current + dir;
 
-      // גבולות — לא גולל מעבר לסקשן ראשון/אחרון
-      if (activeRef.current <= 0 && dir < 0) return;
-      if (activeRef.current >= SECTION_IDS.length - 1 && dir > 0) return;
+      if (next < 0 || next >= SECTION_IDS.length) return; // גבולות
 
-      goTo(activeRef.current + dir);
+      goTo(next);
     };
 
     const onKey = (e) => {
       if (lockRef.current) return;
-      let next = activeRef.current;
-      if      (e.key === 'ArrowDown' || e.key === 'PageDown') next = Math.min(next + 1, SECTION_IDS.length - 1);
-      else if (e.key === 'ArrowUp'   || e.key === 'PageUp'  ) next = Math.max(next - 1, 0);
+      const current = getCurrentSectionIndex();
+      let next = current;
+      if      (e.key === 'ArrowDown' || e.key === 'PageDown') next = Math.min(current + 1, SECTION_IDS.length - 1);
+      else if (e.key === 'ArrowUp'   || e.key === 'PageUp'  ) next = Math.max(current - 1, 0);
       else return;
-      if (next === activeRef.current) return;
+      if (next === current) return;
       e.preventDefault();
       goTo(next);
     };
@@ -108,7 +104,6 @@ export function useSectionScroll() {
     return () => {
       window.removeEventListener('wheel',   onWheel);
       window.removeEventListener('keydown', onKey);
-      observers.forEach(o => o?.disconnect());
       cancelRef.current?.();
     };
   }, []);

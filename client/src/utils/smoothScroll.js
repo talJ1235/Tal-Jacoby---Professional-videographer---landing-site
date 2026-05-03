@@ -4,7 +4,7 @@ function easeOutExpo(t) {
   return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
 }
 
-const DURATION = 1200; // ms — חייב להיות זהה ל-useSectionScroll
+const DURATION = 950; // ms — חייב להיות זהה ל-useSectionScroll
 
 let activeRaf = null;
 
