@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// On Vercel: relative URL (empty = same origin → /api/leads)
+// For local dev with Express: set VITE_API_URL=http://localhost:3001 in .env.local
+const BASE = import.meta.env.VITE_API_URL ?? '';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
+  baseURL: BASE,
   timeout: 10000,
 });
 
@@ -11,7 +15,7 @@ export const submitLead = (data) => api.post('/api/leads', data);
 // Admin helpers
 const adminApi = (password) =>
   axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
+    baseURL: BASE,
     timeout: 10000,
     headers: { 'x-admin-key': password },
   });
