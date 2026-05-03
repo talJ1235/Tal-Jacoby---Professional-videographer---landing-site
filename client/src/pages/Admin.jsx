@@ -8,16 +8,27 @@ import { formatDate } from '../utils';
 import './Admin.css';
 
 const STATUSES = ['חדש', 'בטיפול', 'סגור'];
-const PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'TAL2025';
 
 function LoginGate({ onLogin }) {
   const [pw, setPw] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (pw === PASSWORD) onLogin();
-    else setError('סיסמה שגויה');
+    if (!pw.trim()) return;
+    setLoading(true);
+    setError('');
+    try {
+      // Verify password directly against the API
+      await getLeads(pw, { page: 1 });
+      onLogin(pw);
+    } catch (err) {
+      if (err.response?.status === 401) setError('סיסמה שגויה');
+      else setError('שגיאת חיבור — נסה שוב');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,9 +43,12 @@ function LoginGate({ onLogin }) {
           placeholder="סיסמה"
           className="login-input"
           autoFocus
+          disabled={loading}
         />
         {error && <p className="login-error">{error}</p>}
-        <Button type="submit" size="lg" style={{ width: '100%' }}>כניסה</Button>
+        <Button type="submit" size="lg" style={{ width: '100%' }} disabled={loading}>
+          {loading ? 'מתחבר...' : 'כניסה'}
+        </Button>
       </form>
     </div>
   );
@@ -84,51 +98,38 @@ function NoteCell({ lead, onSave }) {
 }
 
 export function Admin() {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem('admin') === '1');
+  const [password, setPassword] = useState(() => sessionStorage.getItem('admin_pw') || '');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
-  const { leads, total, loading, error, fetchLeads, patchLead, removeLead } = useLeads(PASSWORD);
+  const { leads, total, loading, error, fetchLeads, patchLead, removeLead } = useLeads(password);
 
   useEffect(() => {
-    if (!authed) return;
+    if (!password) return;
     fetchLeads({ search, status: statusFilter, page });
-  }, [authed, search, statusFilter, page]);
+  }, [password, search, statusFilter, page]);
 
-  const handleLogin = () => {
-    sessionStorage.setItem('admin', '1');
-    setAuthed(true);
+  const handleLogin = (pw) => {
+    sessionStorage.setItem('admin_pw', pw);
+    setPassword(pw);
   };
 
-  const handleExport = async () => {
+const handleExportWithPw = async () => {
     try {
-      // Fetch all leads (no pagination)
-      const { data } = await getLeads(PASSWORD, { page: 1 });
+      const { data } = await getLeads(password, { page: 1 });
       const all = data.leads || [];
-
       const rows = all.map((l) => ({
-        'שם':       l.name,
-        'טלפון':    l.phone,
-        'אימייל':   l.email,
-        'שירות':    l.service,
-        'סטטוס':    l.status,
-        'הודעה':    l.message || '',
-        'הערות':    l.notes || '',
-        'תאריך':    formatDate(l.created_at),
+        'שם': l.name, 'טלפון': l.phone, 'אימייל': l.email,
+        'שירות': l.service, 'סטטוס': l.status,
+        'הודעה': l.message || '', 'הערות': l.notes || '',
+        'תאריך': formatDate(l.created_at || l.createdAt),
       }));
-
-      const ws = XLSX.utils.json_to_sheet(rows, { skipHeader: false });
+      const ws = XLSX.utils.json_to_sheet(rows);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'לידים');
-
-      // RTL support for Excel
       ws['!cols'] = [14,14,22,16,10,28,28,14].map(wch => ({ wch }));
-
       XLSX.writeFile(wb, 'leads.xlsx');
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה בייצוא');
-    }
+    } catch { alert('שגיאה בייצוא'); }
   };
 
   const whatsapp = (phone) => {
@@ -139,13 +140,13 @@ export function Admin() {
 
   const totalPages = Math.ceil(total / 20);
 
-  if (!authed) return <LoginGate onLogin={handleLogin} />;
+  if (!password) return <LoginGate onLogin={handleLogin} />;
 
   return (
     <div className="admin">
       <header className="admin-header">
         <h1 className="admin-logo">טל יעקבי — ניהול לידים</h1>
-        <button className="admin-logout" onClick={() => { sessionStorage.removeItem('admin'); setAuthed(false); }}>יציאה</button>
+        <button className="admin-logout" onClick={() => { sessionStorage.removeItem('admin_pw'); setPassword(''); }}>יציאה</button>
       </header>
 
       <div className="admin-body">
@@ -163,7 +164,7 @@ export function Admin() {
             <option value="">כל הסטטוסים</option>
             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
-          <Button variant="outline" size="sm" onClick={handleExport}>ייצוא Excel ⬇</Button>
+          <Button variant="outline" size="sm" onClick={handleExportWithPw}>ייצוא Excel ⬇</Button>
         </div>
 
         {loading && <p className="admin-loading">טוען...</p>}
