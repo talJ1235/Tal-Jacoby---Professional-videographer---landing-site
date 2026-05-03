@@ -46,7 +46,7 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
         >
           <div className="hero__photo hero-photo-ring">
-            <span className="hero__photo-placeholder">תמונה</span>
+            <img src="/hero-photo.png" alt="טל יעקבי" />
           </div>
 
           <div className="hero__badge float-badge">
