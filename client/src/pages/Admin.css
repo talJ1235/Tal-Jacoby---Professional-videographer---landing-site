@@ -344,20 +344,26 @@ td:has(.status-select) {
   align-items: center;
 }
 
-.action-wa, .action-delete {
+.action-wa, .action-delete, .action-archive, .action-msg {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  transition: background 0.15s;
+  border: none;
+  background: none;
+  transition: background 0.15s, color 0.15s;
   cursor: pointer;
-  font-size: 1rem;
+  color: #a0aec0;
+  flex-shrink: 0;
 }
-.action-wa:hover     { background: rgba(37,211,102,0.12); }
-.action-delete       { background: none; border: none; color: #a0aec0; }
-.action-delete:hover { background: rgba(229,62,62,0.1); color: #e53e3e; }
+.action-wa:hover      { background: rgba(37,211,102,0.12); color: #25D366; }
+.action-delete:hover  { background: rgba(229,62,62,0.10); color: #e53e3e; }
+.action-archive       { color: #718096; }
+.action-archive:hover { background: rgba(66,153,225,0.12); color: #3182ce; }
+.action-msg           { color: #a0aec0; }
+.action-msg:hover, .action-msg--open { background: rgba(255,107,74,0.12); color: #FF6B4A; }
 
 /* Inline delete confirmation */
 .delete-confirm {
@@ -391,6 +397,52 @@ td:has(.status-select) {
 .delete-confirm__yes:hover { background: #c53030; }
 .delete-confirm__no  { background: #edf2f7; color: #4a5568; }
 .delete-confirm__no:hover  { background: #e2e8f0; }
+
+/* ── Message expand row ─────────────────────────────── */
+.msg-row td {
+  padding: 0 !important;
+  border-bottom: 2px solid #FF6B4A !important;
+  background: #fffaf9 !important;
+}
+
+.msg-expand {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 20px 16px;
+  animation: slideDown 0.18s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-expand__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #FF6B4A;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.msg-expand__text {
+  width: 100%;
+  min-height: 80px;
+  max-height: 200px;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: #2d3748;
+  background: #fff;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  line-height: 1.6;
+  direction: rtl;
+}
 
 /* ── Pagination ─────────────────────────────────────── */
 .pagination {
