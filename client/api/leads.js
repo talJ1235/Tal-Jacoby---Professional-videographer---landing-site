@@ -50,17 +50,84 @@ async function sendEmails(lead) {
     console.error('Notification email error:', err.message);
   }
 
-  // Send auto-reply to customer (may fail on free tier for non-verified recipients)
+  // Send auto-reply to customer
   try {
     await resend.emails.send({
       from,
       to: lead.email,
-      subject: 'קיבלתי את פנייתך — טל יעקבי',
-      html: `<div dir="rtl" style="font-family:Arial">
-        <h2>שלום ${lead.name},</h2>
-        <p>תודה על פנייתך! קיבלתי את הפרטים ואחזור אליך בהקדם.</p>
-        <p>בברכה,<br><strong>טל יעקבי — צלם וידאו</strong></p>
-      </div>`,
+      subject: `שלום ${lead.name}, קיבלתי את פנייתך ✓`,
+      html: `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;direction:rtl">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:#141210;padding:32px 40px;text-align:center">
+            <div style="font-size:22px;font-weight:700;color:#FF6B4A;letter-spacing:0.04em">טל יעקבי</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px;letter-spacing:0.1em">צלם וידאו מקצועי</div>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:40px">
+            <h2 style="margin:0 0 16px;font-size:22px;color:#1a1a1a">שלום ${lead.name} 👋</h2>
+            <p style="margin:0 0 20px;font-size:15px;color:#555;line-height:1.8">
+              תודה שפנית אליי! קיבלתי את הפרטים שלך ואחזור אליך <strong>תוך 24 שעות</strong>.
+            </p>
+
+            <!-- Summary box -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f9;border-radius:10px;border:1px solid #eee;margin-bottom:28px">
+              <tr><td style="padding:20px 24px">
+                <div style="font-size:11px;color:#FF6B4A;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">פרטי הפנייה</div>
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr><td style="padding:5px 0;font-size:14px;color:#888;width:90px">שירות:</td><td style="padding:5px 0;font-size:14px;color:#222;font-weight:600">${lead.service}</td></tr>
+                  <tr><td style="padding:5px 0;font-size:14px;color:#888">טלפון:</td><td style="padding:5px 0;font-size:14px;color:#222">${lead.phone}</td></tr>
+                  ${lead.message ? `<tr><td style="padding:5px 0;font-size:14px;color:#888;vertical-align:top">הודעה:</td><td style="padding:5px 0;font-size:14px;color:#222">${lead.message}</td></tr>` : ''}
+                </table>
+              </td></tr>
+            </table>
+
+            <p style="margin:0 0 28px;font-size:14px;color:#777;line-height:1.7">
+              בינתיים, מוזמן לבדוק את העבודות שלי באינסטגרם או לצפות בסרטונים ביוטיוב.
+            </p>
+
+            <!-- CTA buttons -->
+            <table cellpadding="0" cellspacing="0" style="margin-bottom:32px">
+              <tr>
+                <td style="padding-left:8px">
+                  <a href="https://www.instagram.com/tal_jacoby1235" style="display:inline-block;padding:12px 22px;background:#141210;color:#fff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600">אינסטגרם ↗</a>
+                </td>
+                <td>
+                  <a href="https://www.youtube.com/@tal100" style="display:inline-block;padding:12px 22px;background:#FF6B4A;color:#fff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600">יוטיוב ↗</a>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:0;font-size:14px;color:#555;line-height:1.7">
+              בברכה,<br>
+              <strong style="color:#1a1a1a">טל יעקבי</strong><br>
+              <span style="color:#888;font-size:13px">054-771-3317 · נתניה והמרכז</span>
+            </p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f9f9f9;padding:20px 40px;text-align:center;border-top:1px solid #eee">
+            <p style="margin:0;font-size:12px;color:#bbb">© 2026 טל יעקבי — כל הזכויות שמורות</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
     });
     console.log('Auto-reply sent OK');
   } catch (err) {
