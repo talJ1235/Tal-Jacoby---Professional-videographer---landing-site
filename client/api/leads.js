@@ -114,7 +114,9 @@ export default async function handler(req, res) {
       countResult = await sql`SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL`;
     }
 
-    return res.json({ leads, total: parseInt(countResult[0].count), page: parseInt(page), pageSize });
+    // Normalize legacy 'new' status → 'חדש'
+    const normalized = leads.map((l) => ({ ...l, status: l.status === 'new' ? 'חדש' : l.status }));
+    return res.json({ leads: normalized, total: parseInt(countResult[0].count), page: parseInt(page), pageSize });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
