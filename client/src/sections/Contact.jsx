@@ -92,7 +92,17 @@ export function Contact() {
     setLoading(true);
     setServerError('');
     try {
-      await submitLead(form);
+      // reCAPTCHA v3 — invisible, runs in background
+      let recaptchaToken = '';
+      try {
+        recaptchaToken = await window.grecaptcha.execute(
+          '6LejutgsAAAAAO1NkQzTlOmVZT5mP3I4mMJyVsF9',
+          { action: 'submit' }
+        );
+      } catch {
+        // if reCAPTCHA fails to load, still allow submission
+      }
+      await submitLead({ ...form, recaptchaToken });
       setSuccess(true);
     } catch (err) {
       const msg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.error || 'שגיאה. נסה שוב.';

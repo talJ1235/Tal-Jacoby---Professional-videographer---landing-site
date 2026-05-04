@@ -79,9 +79,26 @@ export default async function handler(req, res) {
 
   // ── POST /api/leads — public ──────────────────────────────────
   if (req.method === 'POST') {
-    const { name, phone, email, service, message } = req.body || {};
+    const { name, phone, email, service, message, recaptchaToken } = req.body || {};
     if (!name || !phone || !email || !service) {
       return res.status(400).json({ error: 'שדות חובה חסרים' });
+    }
+
+    // reCAPTCHA v3 verification
+    if (process.env.RECAPTCHA_SECRET && recaptchaToken) {
+      try {
+        const verifyRes = await fetch(
+          `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${recaptchaToken}`,
+          { method: 'POST' }
+        );
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success || verifyData.score < 0.5) {
+          return res.status(400).json({ error: 'נכשל אימות בוט. נסה שוב.' });
+        }
+      } catch (err) {
+        console.error('reCAPTCHA verify error:', err.message);
+        // don't block submission if verification fails
+      }
     }
     const [lead] = await sql`
       INSERT INTO leads (name, phone, email, service, message)
