@@ -170,6 +170,22 @@
 }
 .admin-filter:focus { border-color: #FF6B4A; }
 
+.btn-excel {
+  padding: 9px 18px;
+  background: #1D6F42;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.btn-excel:hover { background: #155232; transform: translateY(-1px); }
+
 /* ── Table ──────────────────────────────────────────── */
 .table-wrap {
   overflow-x: auto;

@@ -164,7 +164,7 @@ const handleExportWithPw = async () => {
             <option value="">כל הסטטוסים</option>
             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
-          <Button variant="outline" size="sm" onClick={handleExportWithPw}>ייצוא Excel ⬇</Button>
+          <button className="btn-excel" onClick={handleExportWithPw}>ייצוא Excel ⬇</button>
         </div>
 
         {loading && <p className="admin-loading">טוען...</p>}
