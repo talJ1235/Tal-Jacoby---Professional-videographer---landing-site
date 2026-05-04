@@ -196,13 +196,22 @@
 
 @media (max-width: 768px) {
   .navbar {
-    padding: var(--space-3) var(--space-5);
+    padding: var(--space-4) var(--space-5);
   }
   .navbar__links { display: none; }
   .navbar__wa    { display: none; }
-  .navbar__burger { display: flex; }
+  .navbar__burger {
+    display: flex;
+    padding: var(--space-3);
+    margin-left: calc(-1 * var(--space-3));
+  }
 
   .navbar__logo-img {
-    height: 32px;
+    height: 42px;
+  }
+
+  .burger-line {
+    width: 28px;
+    height: 2.5px;
   }
 }

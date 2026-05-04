@@ -84,13 +84,6 @@ export function About() {
             עם עין אמנותית וגישה אישית, אני מבטיח תוצרים שתרצו לשתף.
           </motion.p>
 
-          {/* Services pills */}
-          <motion.div className="about__services" {...fadeUp} transition={{ duration: 0.7, delay: 0.35 }}>
-            {['אירועים עסקיים', 'סרטוני תדמית', 'וידאו קליפים', 'תיעוד פרויקטים', 'צילום אווירי', 'עריכת וידאו'].map((s) => (
-              <span key={s} className="about__pill">{s}</span>
-            ))}
-          </motion.div>
-
           {/* Stats */}
           <motion.div
             ref={statsRef}

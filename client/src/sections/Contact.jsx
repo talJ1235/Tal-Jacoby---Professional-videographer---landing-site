@@ -17,7 +17,7 @@ function FloatingField({ id, label, type = 'text', value, onChange, error, as = 
   );
 }
 
-const SERVICES = ['צילום חתונה', 'צילום אירוע', 'וידאו תדמית', 'צילום מוצר', 'אחר'];
+const SERVICES = ['צילום אירוע', 'וידאו תדמית', 'צילום מוצר', 'אחר'];
 
 const METHODS = [
   { icon: '📞', label: '054-771-3317', href: 'tel:0547713317' },

@@ -344,7 +344,7 @@ td:has(.status-select) {
   align-items: center;
 }
 
-.action-wa, .action-delete, .action-archive, .action-msg {
+.action-wa, .action-delete, .action-archive, .action-restore, .action-msg {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -362,6 +362,8 @@ td:has(.status-select) {
 .action-delete:hover  { background: rgba(229,62,62,0.10); color: #e53e3e; }
 .action-archive       { color: #718096; }
 .action-archive:hover { background: rgba(66,153,225,0.12); color: #3182ce; }
+.action-restore       { color: #718096; }
+.action-restore:hover { background: rgba(72,187,120,0.12); color: #38a169; }
 .action-msg           { color: #a0aec0; }
 .action-msg:hover, .action-msg--open { background: rgba(255,107,74,0.12); color: #FF6B4A; }
 
@@ -442,6 +444,13 @@ td:has(.status-select) {
   box-sizing: border-box;
   line-height: 1.6;
   direction: rtl;
+}
+
+.msg-expand__empty {
+  font-size: 0.88rem;
+  color: #a0aec0;
+  font-style: italic;
+  padding: 4px 0;
 }
 
 /* ── Pagination ─────────────────────────────────────── */

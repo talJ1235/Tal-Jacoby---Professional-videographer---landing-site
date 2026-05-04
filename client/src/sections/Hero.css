@@ -180,15 +180,28 @@
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .hero__visual {
-    height: 52vw;
-    max-height: 340px;
+    height: min(68vw, 460px);   /* bigger photo — was 52vw/340px */
+    max-height: none;
+    margin-top: 70px;           /* navbar height */
   }
 
-  .hero__name  { font-size: clamp(2.4rem, 10vw, 3.2rem); }
-  .hero__title { font-size: 0.9rem; letter-spacing: 0.18em; }
+  .hero__circle-wrap {
+    width: 90%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .hero__photo-wrap {
+    left: 50%;
+    height: 118%;
+  }
+
+  .hero__name  { font-size: clamp(2.6rem, 11vw, 3.4rem); }
+  .hero__title { font-size: 0.92rem; letter-spacing: 0.18em; }
 
   .hero__text {
-    padding: var(--space-6) var(--space-5) var(--space-10);
+    padding: var(--space-6) var(--space-6) var(--space-10);
   }
 
   .hero__ctas .btn {
