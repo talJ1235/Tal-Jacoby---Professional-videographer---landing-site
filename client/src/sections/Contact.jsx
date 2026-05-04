@@ -108,7 +108,7 @@ export function Contact() {
 
       <div className="contact__inner section">
 
-        {/* Left — identity + contact methods + socials */}
+        {/* Left — eyebrow + heading + contact methods */}
         <motion.div className="contact__left" {...fadeUp(0)}>
           <span className="contact__eyebrow">יצירת קשר</span>
           <h2 className="contact__heading">בואו נדבר</h2>
@@ -132,24 +132,6 @@ export function Contact() {
               )
             )}
           </div>
-
-          {/* Social links */}
-          <div className="contact__socials">
-            {SOCIALS.map(({ href, label, svg }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="contact__social-link"
-              >
-                {svg}
-              </a>
-            ))}
-          </div>
-
-          <p className="contact__copy">© 2025 כל הזכויות שמורות</p>
         </motion.div>
 
         {/* Right — glass form card */}
@@ -180,13 +162,32 @@ export function Contact() {
 
                 {serverError && <p className="server-error">{serverError}</p>}
 
-                <Button type="submit" size="lg" disabled={loading} style={{ width: '100%', marginTop: 'var(--space-2)' }}>
+                <Button type="submit" size="lg" disabled={loading} className="contact__submit-btn">
                   {loading ? 'שולח...' : 'שלח פנייה'}
                 </Button>
               </motion.form>
             )}
           </AnimatePresence>
         </motion.div>
+
+        {/* Footer — socials + copyright (below form on mobile, below left col on desktop) */}
+        <div className="contact__footer">
+          <div className="contact__socials">
+            {SOCIALS.map(({ href, label, svg }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="contact__social-link"
+              >
+                {svg}
+              </a>
+            ))}
+          </div>
+          <p className="contact__copy">© 2026 כל הזכויות שמורות — טל יעקבי</p>
+        </div>
 
       </div>
     </section>

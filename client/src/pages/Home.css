@@ -1,0 +1,37 @@
+/* ── Section separator ───────────────────────────────────────── */
+.section-sep {
+  position: relative;
+  height: 2px;
+  z-index: 10;
+
+  /* Glowing gradient line */
+  background: linear-gradient(
+    90deg,
+    transparent       0%,
+    rgba(255,107,74,0.08)  10%,
+    rgba(255,107,74,0.55)  35%,
+    rgba(196,160,80, 0.75) 50%,
+    rgba(255,107,74,0.55)  65%,
+    rgba(255,107,74,0.08)  90%,
+    transparent       100%
+  );
+
+  /* Soft outer glow */
+  box-shadow:
+    0 0 8px  rgba(255,107,74,0.18),
+    0 0 20px rgba(255,107,74,0.08);
+}
+
+/* Central gem / diamond accent */
+.section-sep__gem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 7px;
+  height: 7px;
+  background: rgba(196, 160, 80, 0.85);
+  box-shadow:
+    0 0 6px  rgba(255,107,74,0.6),
+    0 0 14px rgba(255,107,74,0.25);
+}

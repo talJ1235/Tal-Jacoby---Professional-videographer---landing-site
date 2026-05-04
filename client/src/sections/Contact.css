@@ -42,18 +42,24 @@
   );
 }
 
+/* ── Desktop grid: left col (info + footer) | right col (form) ── */
 .contact__inner {
   position: relative;
   z-index: 1;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1.4fr;
-  gap: var(--space-16);
-  align-items: center;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "left form"
+    "footer form";
+  gap: var(--space-8) var(--space-16);
+  align-items: start;
 }
 
 /* ── Left column ── */
 .contact__left {
+  grid-area: left;
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
@@ -113,13 +119,20 @@ a.contact__method:hover { color: var(--theme-text-on-dark); }
   font-size: 0.85rem;
 }
 
+/* ── Footer (socials + copyright) ── */
+.contact__footer {
+  grid-area: footer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
 /* ── Social links ── */
 .contact__socials {
   display: flex;
   gap: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  margin-top: var(--space-2);
 }
 
 .contact__social-link {
@@ -145,12 +158,12 @@ a.contact__method:hover { color: var(--theme-text-on-dark); }
 .contact__copy {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.2);
-  margin-top: var(--space-3);
   letter-spacing: 0.04em;
 }
 
 /* ── Right column — glass card ── */
 .contact__form-wrap {
+  grid-area: form;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
@@ -238,6 +251,12 @@ textarea:not(:placeholder-shown) ~ .field__label {
 .field__error { font-size: 0.78rem; color: #E53E3E; margin-top: 4px; display: block; }
 .server-error { color: #E53E3E; font-size: 0.88rem; text-align: center; }
 
+/* Submit button — full width inside form */
+.contact__submit-btn {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
 /* ── Success state ── */
 .success-state {
   display: flex;
@@ -267,6 +286,11 @@ textarea:not(:placeholder-shown) ~ .field__label {
 @media (max-width: 900px) {
   .contact__inner {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "left"
+      "form"
+      "footer";
     gap: var(--space-8);
   }
   .contact__form-wrap {
@@ -280,45 +304,44 @@ textarea:not(:placeholder-shown) ~ .field__label {
 @media (max-width: 768px) {
   .contact {
     min-height: unset;
-    padding-top: 56px;
-    padding-bottom: 56px;
+    padding-top: 52px;
+    padding-bottom: 52px;
     align-items: flex-start;
   }
 
   .contact__inner {
     grid-template-columns: 1fr;
-    gap: var(--space-6);
+    grid-template-rows: auto;
+    grid-template-areas:
+      "left"
+      "form"
+      "footer";
+    gap: var(--space-5);
     align-items: start;
   }
 
-  /* Form comes FIRST on mobile */
-  .contact__form-wrap {
-    order: -1;
-    padding: var(--space-5) var(--space-5);
-    border-radius: 16px;
-    margin: 0 var(--space-1);
-  }
-
-  /* Compact info section below the form */
+  /* ── Top info block ── */
   .contact__left {
-    gap: var(--space-4);
-    padding: 0 var(--space-1);
+    gap: var(--space-3);
+    padding: 0 var(--space-2);
   }
 
-  /* Hide verbose text on mobile — just show quick contact info */
-  .contact__eyebrow { display: none; }
-  .contact__heading { font-size: 1.5rem; }
-  .contact__sub     { display: none; }
+  .contact__eyebrow {
+    display: block; /* visible on mobile */
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+  }
+
+  .contact__heading { font-size: 1.6rem; }
+
+  .contact__sub { display: none; } /* too verbose on mobile */
 
   .contact__methods {
-    display: flex;
-    flex-direction: column;
     gap: var(--space-2);
+    padding-top: var(--space-1);
   }
 
-  .contact__method {
-    font-size: 0.85rem;
-  }
+  .contact__method { font-size: 0.85rem; }
 
   .contact__method-icon {
     width: 30px;
@@ -326,17 +349,24 @@ textarea:not(:placeholder-shown) ~ .field__label {
     font-size: 0.78rem;
   }
 
-  /* Socials row — compact at bottom */
-  .contact__socials {
-    gap: var(--space-3);
-    padding-top: var(--space-3);
-    margin-top: 0;
-    justify-content: flex-start;
+  /* ── Form card — narrower ── */
+  .contact__form-wrap {
+    margin: 0 var(--space-3);
+    padding: var(--space-5) var(--space-4);
+    border-radius: 16px;
   }
 
-  .contact__social-link {
-    width: 44px;
-    height: 44px;
+  /* Slightly smaller submit button */
+  .contact__submit-btn {
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex !important;
+  }
+
+  .contact__submit-btn.btn--lg {
+    padding: var(--space-3) var(--space-8);
+    font-size: 1rem;
   }
 
   /* Form fields */
@@ -345,12 +375,26 @@ textarea:not(:placeholder-shown) ~ .field__label {
     padding: 22px var(--space-4) 10px;
   }
 
-  .field__label {
-    font-size: 0.95rem;
+  .field__label { font-size: 0.95rem; }
+
+  textarea.field__input { min-height: 70px; }
+
+  /* ── Footer block — socials + copyright ── */
+  .contact__footer {
+    padding: var(--space-3) var(--space-2) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    gap: var(--space-2);
   }
 
-  textarea.field__input {
-    min-height: 70px;
+  .contact__socials { gap: var(--space-3); }
+
+  .contact__social-link {
+    width: 44px;
+    height: 44px;
+  }
+
+  .contact__copy {
+    font-size: 0.72rem;
   }
 }
 
