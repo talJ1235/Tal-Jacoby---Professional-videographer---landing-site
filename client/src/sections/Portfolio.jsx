@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Modal } from '../components/ui/Modal';
 import './Portfolio.css';
 
@@ -111,9 +111,26 @@ function LightboxContent({ item }) {
 // ── Component ─────────────────────────────────────────────────
 export function Portfolio() {
   const [lightbox, setLightbox] = useState(null);
+  const sectionRef = useRef(null);
+  const viewFired = useRef(false);
+
+  // Meta Pixel — ViewContent when portfolio section enters view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !viewFired.current) {
+          viewFired.current = true;
+          if (window.fbq) window.fbq('track', 'ViewContent', { content_name: 'Portfolio' });
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section id="portfolio" className="portfolio">
+    <section id="portfolio" className="portfolio" ref={sectionRef}>
       <div className="collage-grid">
         {PORTFOLIO_ITEMS.map((item) => {
           const thumb = getThumbSrc(item);

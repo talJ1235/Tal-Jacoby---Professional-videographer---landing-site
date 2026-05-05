@@ -132,7 +132,8 @@ export function Contact() {
           <div className="contact__methods">
             {METHODS.map(({ icon, label, href }) =>
               href ? (
-                <a key={label} href={href} className="contact__method">
+                <a key={label} href={href} className="contact__method"
+                  onClick={() => { if (window.fbq) window.fbq('track', 'Contact'); }}>
                   <span className="contact__method-icon">{icon}</span>
                   <span>{label}</span>
                 </a>
@@ -162,7 +163,8 @@ export function Contact() {
                 <p>תודה! אחזור אליך בהקדם האפשרי.</p>
               </motion.div>
             ) : (
-              <motion.form key="form" className="contact__form" onSubmit={handleSubmit} noValidate>
+              <motion.form key="form" className="contact__form" onSubmit={handleSubmit} noValidate
+                onFocus={() => { if (window.fbq && !window._fbqCheckout) { window._fbqCheckout = true; window.fbq('track', 'InitiateCheckout'); } }}>
                 <FloatingField id="name"    label="שם מלא"           value={form.name}    onChange={set('name')}    error={errors.name} />
                 <FloatingField id="phone"   label="טלפון"            type="tel" value={form.phone}   onChange={set('phone')}   error={errors.phone} />
                 <FloatingField id="email"   label="אימייל"           type="email" value={form.email} onChange={set('email')}   error={errors.email} />
