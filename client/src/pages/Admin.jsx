@@ -108,14 +108,24 @@ function ConfirmBtn({ confirmText, onConfirm, children, className }) {
   const [open, setOpen] = useState(false);
   return (
     <span className="confirm-wrap">
-      {open ? (
+      {/* Button always in DOM — visibility:hidden keeps its size so no layout shift */}
+      <button
+        className={className}
+        onClick={() => setOpen(true)}
+        style={{ visibility: open ? 'hidden' : 'visible' }}
+      >
+        {children}
+      </button>
+      {open && (
         <span className="delete-confirm">
           <span className="delete-confirm__txt">{confirmText}</span>
-          <button className="delete-confirm__yes" onClick={async () => { setOpen(false); await onConfirm(); }} title="אישור">✓</button>
-          <button className="delete-confirm__no"  onClick={() => setOpen(false)} title="ביטול">✕</button>
+          <button className="delete-confirm__yes"
+            onClick={async () => { setOpen(false); await onConfirm(); }}
+            title="אישור">✓</button>
+          <button className="delete-confirm__no"
+            onClick={() => setOpen(false)}
+            title="ביטול">✕</button>
         </span>
-      ) : (
-        <button className={className} onClick={() => setOpen(true)}>{children}</button>
       )}
     </span>
   );
@@ -264,7 +274,7 @@ export function Admin() {
                             <ConfirmBtn
                               confirmText="להיסטוריה?"
                               onConfirm={async () => {
-                                await patchLead(lead.id, { status: 'סגור' });
+                                try { await patchLead(lead.id, { status: 'סגור' }); } catch(e) { console.error('archive failed', e); }
                                 fetchLeads({ search, status: statusFilter, page });
                               }}
                               className="action-archive"
@@ -280,7 +290,7 @@ export function Admin() {
                               <ConfirmBtn
                                 confirmText="לפעילים?"
                                 onConfirm={async () => {
-                                  await patchLead(lead.id, { status: 'חדש' });
+                                  try { await patchLead(lead.id, { status: 'חדש' }); } catch(e) { console.error('restore failed', e); }
                                   fetchLeads({ search, status: statusFilter, page });
                                 }}
                                 className="action-restore"
