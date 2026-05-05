@@ -1,6 +1,22 @@
 import { neon } from '@neondatabase/serverless';
 import { Resend } from 'resend';
 
+// ── Security helpers ────────────────────────────────────────────
+const VALID_SERVICES = ['צילום אירוע', 'וידאו תדמית', 'צילום מוצר', 'אחר'];
+
+function sanitize(val, maxLen = 200) {
+  return String(val ?? '').trim().slice(0, maxLen);
+}
+
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 const getDb = () => neon(process.env.DATABASE_URL);
 
 async function initTable(sql) {
@@ -37,14 +53,14 @@ async function sendEmails(lead) {
     await resend.emails.send({
       from,
       to: notifyTo,
-      subject: `ליד חדש: ${lead.name}`,
+      subject: `ליד חדש: ${escapeHtml(lead.name)}`,
       html: `<div dir="rtl" style="font-family:Arial">
         <h2>ליד חדש התקבל!</h2>
-        <p><strong>שם:</strong> ${lead.name}</p>
-        <p><strong>טלפון:</strong> ${lead.phone}</p>
-        <p><strong>אימייל:</strong> ${lead.email}</p>
-        <p><strong>שירות:</strong> ${lead.service}</p>
-        ${lead.message ? `<p><strong>הודעה:</strong> ${lead.message}</p>` : ''}
+        <p><strong>שם:</strong> ${escapeHtml(lead.name)}</p>
+        <p><strong>טלפון:</strong> ${escapeHtml(lead.phone)}</p>
+        <p><strong>אימייל:</strong> ${escapeHtml(lead.email)}</p>
+        <p><strong>שירות:</strong> ${escapeHtml(lead.service)}</p>
+        ${lead.message ? `<p><strong>הודעה:</strong> ${escapeHtml(lead.message)}</p>` : ''}
         <p><strong>תאריך:</strong> ${new Date(lead.created_at).toLocaleString('he-IL')}</p>
       </div>`,
     });
@@ -78,7 +94,7 @@ async function sendEmails(lead) {
         <!-- Body -->
         <tr>
           <td style="padding:40px">
-            <h2 style="margin:0 0 16px;font-size:22px;color:#1a1a1a">שלום ${lead.name} 👋</h2>
+            <h2 style="margin:0 0 16px;font-size:22px;color:#1a1a1a">שלום ${escapeHtml(lead.name)} 👋</h2>
             <p style="margin:0 0 20px;font-size:15px;color:#555;line-height:1.8">
               תודה שפנית אליי! קיבלתי את הפרטים שלך ואחזור אליך <strong>תוך 24 שעות</strong>.
             </p>
@@ -88,9 +104,9 @@ async function sendEmails(lead) {
               <tr><td style="padding:20px 24px">
                 <div style="font-size:11px;color:#FF6B4A;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">פרטי הפנייה</div>
                 <table width="100%" cellpadding="0" cellspacing="0">
-                  <tr><td style="padding:5px 0;font-size:14px;color:#888;width:90px">שירות:</td><td style="padding:5px 0;font-size:14px;color:#222;font-weight:600">${lead.service}</td></tr>
-                  <tr><td style="padding:5px 0;font-size:14px;color:#888">טלפון:</td><td style="padding:5px 0;font-size:14px;color:#222">${lead.phone}</td></tr>
-                  ${lead.message ? `<tr><td style="padding:5px 0;font-size:14px;color:#888;vertical-align:top">הודעה:</td><td style="padding:5px 0;font-size:14px;color:#222">${lead.message}</td></tr>` : ''}
+                  <tr><td style="padding:5px 0;font-size:14px;color:#888;width:90px">שירות:</td><td style="padding:5px 0;font-size:14px;color:#222;font-weight:600">${escapeHtml(lead.service)}</td></tr>
+                  <tr><td style="padding:5px 0;font-size:14px;color:#888">טלפון:</td><td style="padding:5px 0;font-size:14px;color:#222">${escapeHtml(lead.phone)}</td></tr>
+                  ${lead.message ? `<tr><td style="padding:5px 0;font-size:14px;color:#888;vertical-align:top">הודעה:</td><td style="padding:5px 0;font-size:14px;color:#222">${escapeHtml(lead.message)}</td></tr>` : ''}
                 </table>
               </td></tr>
             </table>
@@ -149,9 +165,33 @@ export default async function handler(req, res) {
 
   // ── POST /api/leads — public ──────────────────────────────────
   if (req.method === 'POST') {
-    const { name, phone, email, service, message, recaptchaToken } = req.body || {};
-    if (!name || !phone || !email || !service) {
+    const { name, phone, email, service, message, recaptchaToken, website } = req.body || {};
+
+    // Honeypot: bots fill hidden fields, humans don't
+    if (website) {
+      // Silent 200 so bots think they succeeded
+      return res.status(200).json({ success: true });
+    }
+
+    // Sanitize + enforce length limits (extra layer on top of parameterized queries)
+    const cleanName    = sanitize(name, 100);
+    const cleanPhone   = sanitize(phone, 30);
+    const cleanEmail   = sanitize(email, 200);
+    const cleanService = sanitize(service, 50);
+    const cleanMessage = sanitize(message, 2000);
+
+    if (!cleanName || !cleanPhone || !cleanEmail || !cleanService) {
       return res.status(400).json({ error: 'שדות חובה חסרים' });
+    }
+
+    // Validate email format
+    if (!/\S+@\S+\.\S+/.test(cleanEmail)) {
+      return res.status(400).json({ error: 'כתובת אימייל לא תקינה' });
+    }
+
+    // Validate service against whitelist — prevents unexpected values
+    if (!VALID_SERVICES.includes(cleanService)) {
+      return res.status(400).json({ error: 'שירות לא תקין' });
     }
 
     // Rate limiting: max 6 submissions per IP per hour
@@ -186,7 +226,7 @@ export default async function handler(req, res) {
     }
     const [lead] = await sql`
       INSERT INTO leads (name, phone, email, service, message, ip)
-      VALUES (${name}, ${phone}, ${email}, ${service}, ${message || ''}, ${ip})
+      VALUES (${cleanName}, ${cleanPhone}, ${cleanEmail}, ${cleanService}, ${cleanMessage}, ${ip})
       RETURNING *
     `;
     await sendEmails(lead);

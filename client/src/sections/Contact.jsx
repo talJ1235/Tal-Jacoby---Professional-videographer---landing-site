@@ -65,7 +65,7 @@ const fadeUp = (delay = 0) => ({
 });
 
 export function Contact() {
-  const [form, setForm] = useState({ name: '', phone: '', email: '', service: '', message: '' });
+  const [form, setForm] = useState({ name: '', phone: '', email: '', service: '', message: '', website: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -164,6 +164,17 @@ export function Contact() {
             ) : (
               <motion.form key="form" className="contact__form" onSubmit={handleSubmit} noValidate
                 onFocus={() => { if (window.fbq && !window._fbqCheckout) { window._fbqCheckout = true; window.fbq('track', 'InitiateCheckout'); } }}>
+                {/* Honeypot — invisible to humans, bots fill it in → silent reject on server */}
+                <input
+                  type="text"
+                  name="website"
+                  value={form.website}
+                  onChange={set('website')}
+                  style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
                 <FloatingField id="name"    label="שם מלא"           value={form.name}    onChange={set('name')}    error={errors.name} />
                 <FloatingField id="phone"   label="טלפון"            type="tel" value={form.phone}   onChange={set('phone')}   error={errors.phone} />
                 <FloatingField id="email"   label="אימייל"           type="email" value={form.email} onChange={set('email')}   error={errors.email} />
