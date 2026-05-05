@@ -21,7 +21,6 @@ const SERVICES = ['צילום אירוע', 'וידאו תדמית', 'צילום 
 
 const METHODS = [
   { icon: '📞', label: '054-771-3317', href: 'tel:0547713317' },
-  { icon: '✉', label: 'tal.jacoby1235@gmail.com', href: 'mailto:tal.jacoby1235@gmail.com' },
   { icon: '📍', label: 'נתניה והמרכז', href: null },
 ];
 
