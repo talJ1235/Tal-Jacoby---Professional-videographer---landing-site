@@ -103,6 +103,8 @@ export function Contact() {
         // if reCAPTCHA fails to load, still allow submission
       }
       await submitLead({ ...form, recaptchaToken });
+      // Meta Pixel — track Lead event
+      if (window.fbq) window.fbq('track', 'Lead');
       setSuccess(true);
     } catch (err) {
       const msg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.error || 'שגיאה. נסה שוב.';
