@@ -106,14 +106,19 @@ function NoteCell({ lead, onSave }) {
 // ── Inline confirm wrapper ─────────────────────────────────────
 function ConfirmBtn({ confirmText, onConfirm, children, className }) {
   const [open, setOpen] = useState(false);
-  if (open) return (
-    <span className="delete-confirm">
-      <span className="delete-confirm__txt">{confirmText}</span>
-      <button className="delete-confirm__yes" onClick={async () => { setOpen(false); await onConfirm(); }} title="אישור">✓</button>
-      <button className="delete-confirm__no"  onClick={() => setOpen(false)} title="ביטול">✕</button>
+  return (
+    <span className="confirm-wrap">
+      {open ? (
+        <span className="delete-confirm">
+          <span className="delete-confirm__txt">{confirmText}</span>
+          <button className="delete-confirm__yes" onClick={async () => { setOpen(false); await onConfirm(); }} title="אישור">✓</button>
+          <button className="delete-confirm__no"  onClick={() => setOpen(false)} title="ביטול">✕</button>
+        </span>
+      ) : (
+        <button className={className} onClick={() => setOpen(true)}>{children}</button>
+      )}
     </span>
   );
-  return <button className={className} onClick={() => setOpen(true)}>{children}</button>;
 }
 
 // ── Main Admin ─────────────────────────────────────────────────
@@ -258,7 +263,10 @@ export function Admin() {
                           {activeTab === 'active' ? (
                             <ConfirmBtn
                               confirmText="להיסטוריה?"
-                              onConfirm={() => patchLead(lead.id, { status: 'סגור' })}
+                              onConfirm={async () => {
+                                await patchLead(lead.id, { status: 'סגור' });
+                                fetchLeads({ search, status: statusFilter, page });
+                              }}
                               className="action-archive"
                               title="העבר להיסטוריה"
                             >
@@ -271,7 +279,10 @@ export function Admin() {
                             <>
                               <ConfirmBtn
                                 confirmText="לפעילים?"
-                                onConfirm={() => patchLead(lead.id, { status: 'חדש' })}
+                                onConfirm={async () => {
+                                  await patchLead(lead.id, { status: 'חדש' });
+                                  fetchLeads({ search, status: statusFilter, page });
+                                }}
                                 className="action-restore"
                                 title="שחזר ללידים פעילים"
                               >
