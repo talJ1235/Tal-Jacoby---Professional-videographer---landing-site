@@ -342,6 +342,9 @@ td:has(.status-select) {
   display: flex;
   gap: 8px;
   align-items: center;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
 }
 
 .action-wa, .action-delete, .action-archive, .action-restore, .action-msg {
@@ -367,12 +370,15 @@ td:has(.status-select) {
 .action-msg           { color: #a0aec0; }
 .action-msg:hover, .action-msg--open { background: rgba(255,107,74,0.12); color: #FF6B4A; }
 
-/* Confirm wrapper — position:relative so dialog can float above */
+/* Confirm wrapper — fixed size matches button so cell never shifts */
 .confirm-wrap {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
 }
 
 /* Confirm dialog — absolute so it doesn't push ANY other row */
