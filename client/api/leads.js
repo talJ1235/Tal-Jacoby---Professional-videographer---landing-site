@@ -15,9 +15,12 @@ async function initTable(sql) {
       status      TEXT    DEFAULT 'new',
       notes       TEXT    DEFAULT '',
       created_at  TIMESTAMPTZ DEFAULT NOW(),
-      deleted_at  TIMESTAMPTZ
+      deleted_at  TIMESTAMPTZ,
+      ip          TEXT    DEFAULT ''
     )
   `;
+  // Add ip column if it doesn't exist (for existing tables)
+  await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS ip TEXT DEFAULT ''`;
 }
 
 async function sendEmails(lead) {
@@ -151,6 +154,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'שדות חובה חסרים' });
     }
 
+    // Rate limiting: max 6 submissions per IP per hour
+    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || '';
+    if (ip) {
+      const [{ count }] = await sql`
+        SELECT COUNT(*) as count FROM leads
+        WHERE ip = ${ip}
+        AND created_at > NOW() - INTERVAL '1 hour'
+        AND deleted_at IS NULL
+      `;
+      if (parseInt(count) >= 6) {
+        return res.status(429).json({ error: 'יותר מדי פניות. נסה שוב מאוחר יותר.' });
+      }
+    }
+
     // reCAPTCHA v3 verification
     if (process.env.RECAPTCHA_SECRET && recaptchaToken) {
       try {
@@ -168,8 +185,8 @@ export default async function handler(req, res) {
       }
     }
     const [lead] = await sql`
-      INSERT INTO leads (name, phone, email, service, message)
-      VALUES (${name}, ${phone}, ${email}, ${service}, ${message || ''})
+      INSERT INTO leads (name, phone, email, service, message, ip)
+      VALUES (${name}, ${phone}, ${email}, ${service}, ${message || ''}, ${ip})
       RETURNING *
     `;
     await sendEmails(lead);
