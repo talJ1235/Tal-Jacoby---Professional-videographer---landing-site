@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { Resend } from 'resend';
+import { setCors, getClientIp } from './_lib/security.js';
 
 // ── Security helpers ────────────────────────────────────────────
 const VALID_SERVICES = ['צילום אירוע', 'וידאו תדמית', 'צילום מוצר', 'אחר'];
@@ -155,10 +156,7 @@ async function sendEmails(lead) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-key');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (setCors(req, res, 'GET, POST, OPTIONS')) return;
 
   const sql = getDb();
   await initTable(sql);
@@ -194,18 +192,29 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'שירות לא תקין' });
     }
 
-    // Rate limiting: max 6 submissions per IP per hour
-    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || '';
-    if (ip) {
-      const [{ count }] = await sql`
+    // Rate limiting by IP — max 6 submissions per hour
+    const ip = getClientIp(req);
+    if (ip && ip !== 'unknown') {
+      const [{ count: ipCount }] = await sql`
         SELECT COUNT(*) as count FROM leads
         WHERE ip = ${ip}
         AND created_at > NOW() - INTERVAL '1 hour'
         AND deleted_at IS NULL
       `;
-      if (parseInt(count) >= 6) {
+      if (parseInt(ipCount) >= 6) {
         return res.status(429).json({ error: 'יותר מדי פניות. נסה שוב מאוחר יותר.' });
       }
+    }
+
+    // Rate limiting by email — max 3 submissions per email per 24h (catches VPN bypass)
+    const [{ count: emailCount }] = await sql`
+      SELECT COUNT(*) as count FROM leads
+      WHERE email = ${cleanEmail}
+      AND created_at > NOW() - INTERVAL '24 hours'
+      AND deleted_at IS NULL
+    `;
+    if (parseInt(emailCount) >= 3) {
+      return res.status(429).json({ error: 'כתובת האימייל הזו כבר שלחה פנייה לאחרונה.' });
     }
 
     // reCAPTCHA v3 verification
