@@ -2,7 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import { Resend } from 'resend';
 import { setCors, getClientIp } from './_lib/security.js';
 
-// ── Security helpers ────────────────────────────────────────────
+// ── Security & validation helpers ──────────────────────────────
 const VALID_SERVICES = ['צילום אירוע', 'וידאו תדמית', 'צילום מוצר', 'אחר'];
 
 function sanitize(val, maxLen = 200) {
@@ -16,6 +16,35 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;');
+}
+
+function validateFields({ name, phone, email, service }) {
+  const errs = [];
+
+  // Name: must contain letters, at least 2 chars, not digits-only
+  if (!name || name.length < 2)
+    errs.push('שם חייב להכיל לפחות 2 תווים');
+  else if (!/[֐-׿a-zA-Z]/.test(name))
+    errs.push('שם חייב להכיל אותיות');
+
+  // Phone: Israeli format — 9-10 digits starting with 0, or with 972 prefix
+  const phoneDigits = (phone || '').replace(/[\s\-().+]/g, '');
+  if (!phoneDigits)
+    errs.push('טלפון הוא שדה חובה');
+  else if (!/^(0[0-9]{8,9}|972[0-9]{8,9})$/.test(phoneDigits))
+    errs.push('מספר טלפון לא תקין');
+
+  // Email: proper format, local@domain.tld
+  if (!email)
+    errs.push('אימייל הוא שדה חובה');
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
+    errs.push('כתובת אימייל לא תקינה');
+
+  // Service: whitelist
+  if (!VALID_SERVICES.includes(service))
+    errs.push('סוג שירות לא תקין');
+
+  return errs;
 }
 
 const getDb = () => neon(process.env.DATABASE_URL);
@@ -178,18 +207,12 @@ export default async function handler(req, res) {
     const cleanService = sanitize(service, 50);
     const cleanMessage = sanitize(message, 2000);
 
-    if (!cleanName || !cleanPhone || !cleanEmail || !cleanService) {
-      return res.status(400).json({ error: 'שדות חובה חסרים' });
-    }
-
-    // Validate email format
-    if (!/\S+@\S+\.\S+/.test(cleanEmail)) {
-      return res.status(400).json({ error: 'כתובת אימייל לא תקינה' });
-    }
-
-    // Validate service against whitelist — prevents unexpected values
-    if (!VALID_SERVICES.includes(cleanService)) {
-      return res.status(400).json({ error: 'שירות לא תקין' });
+    // Full validation (mirrors frontend — double protection)
+    const validationErrors = validateFields({
+      name: cleanName, phone: cleanPhone, email: cleanEmail, service: cleanService,
+    });
+    if (validationErrors.length) {
+      return res.status(400).json({ error: validationErrors[0] });
     }
 
     // Rate limiting by IP — max 6 submissions per hour

@@ -75,11 +75,40 @@ export function Contact() {
 
   const validate = () => {
     const errs = {};
-    if (!form.name.trim()) errs.name = 'שדה חובה';
-    if (!form.phone.trim()) errs.phone = 'שדה חובה';
-    if (!form.email.trim()) errs.email = 'שדה חובה';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = 'כתובת אימייל לא תקינה';
+
+    // ── שם מלא ──────────────────────────────────────────────────
+    const name = form.name.trim();
+    if (!name) {
+      errs.name = 'שדה חובה';
+    } else if (name.length < 2) {
+      errs.name = 'שם חייב להכיל לפחות 2 תווים';
+    } else if (!/[֐-׿a-zA-Z]/.test(name)) {
+      errs.name = 'שם חייב להכיל אותיות';
+    } else if (/^[0-9\s]+$/.test(name)) {
+      errs.name = 'שם לא יכול להכיל מספרים בלבד';
+    }
+
+    // ── טלפון ישראלי ─────────────────────────────────────────────
+    const phoneDigits = form.phone.replace(/[\s\-().+]/g, '');
+    if (!form.phone.trim()) {
+      errs.phone = 'שדה חובה';
+    } else if (!/^(0[0-9]{8,9}|972[0-9]{8,9})$/.test(phoneDigits)) {
+      errs.phone = 'מספר לא תקין — לדוגמה: 054-7713317';
+    }
+
+    // ── אימייל ───────────────────────────────────────────────────
+    const email = form.email.trim();
+    if (!email) {
+      errs.email = 'שדה חובה';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      errs.email = 'כתובת אימייל לא תקינה — לדוגמה: name@gmail.com';
+    } else if (/^\d+@/.test(email)) {
+      errs.email = 'אימייל לא נראה תקין';
+    }
+
+    // ── סוג שירות ────────────────────────────────────────────────
     if (!form.service) errs.service = 'בחר סוג שירות';
+
     return errs;
   };
 
