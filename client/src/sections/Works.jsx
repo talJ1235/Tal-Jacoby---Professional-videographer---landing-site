@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { works } from '../data/works';
 import { WorkCard } from '../components/WorkCard';
+import { PlayerOverlay } from '../components/PlayerOverlay';
 import './Works.css';
 
 const FILTERS = [
@@ -12,6 +13,8 @@ const FILTERS = [
 
 export function Works() {
   const [filter, setFilter] = useState('all');
+  const [expanded, setExpanded] = useState(null);
+  const openerRef = useRef(null);
 
   const reduce =
     typeof window !== 'undefined' &&
@@ -23,9 +26,17 @@ export function Works() {
   );
 
   const handleOpen = (work) => {
-    // Player is wired in the next step.
-    // eslint-disable-next-line no-console
-    console.log('open work', work.id);
+    openerRef.current = document.activeElement;
+    setExpanded(work);
+  };
+
+  const handleClose = () => {
+    setExpanded(null);
+    // Return focus to the card that opened the player.
+    const opener = openerRef.current;
+    if (opener && typeof opener.focus === 'function') {
+      requestAnimationFrame(() => opener.focus());
+    }
   };
 
   const cardAnim = (index) =>
@@ -76,6 +87,12 @@ export function Works() {
           </AnimatePresence>
         </div>
       </div>
+
+      <AnimatePresence>
+        {expanded && (
+          <PlayerOverlay key={expanded.id} work={expanded} onClose={handleClose} />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
