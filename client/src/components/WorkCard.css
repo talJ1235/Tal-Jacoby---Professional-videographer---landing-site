@@ -1,0 +1,80 @@
+.workcard {
+  display: block;
+  width: 100%;
+  text-align: start;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.workcard:focus-visible {
+  outline: 1px solid var(--text-1);
+  outline-offset: 4px;
+}
+
+.workcard__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg-1);
+}
+
+/* Inner wrapper carries the hover scale so the layoutId wrapper stays clean */
+.workcard__media-inner {
+  position: absolute;
+  inset: 0;
+  transform: scale(1);
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.workcard__media-inner.is-active {
+  transform: scale(1.03);
+}
+
+.workcard__thumb,
+.workcard__preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.workcard__preview {
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.workcard__preview.is-active {
+  opacity: 1;
+}
+
+.workcard__meta {
+  margin-block-start: 14px;
+}
+
+.workcard__title {
+  font-size: var(--fs-work-title);
+  font-weight: 500;
+  color: var(--text-2);
+  transition: color var(--dur-fast) ease;
+}
+
+.workcard__title.is-active {
+  color: var(--text-1);
+}
+
+.workcard__tag {
+  margin-block-start: 4px;
+  font-size: var(--fs-work-tag);
+  color: var(--text-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workcard__media-inner,
+  .workcard__media-inner.is-active {
+    transform: none;
+    transition: none;
+  }
+}

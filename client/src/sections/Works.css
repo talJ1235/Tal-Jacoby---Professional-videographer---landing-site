@@ -1,4 +1,67 @@
 .works {
-  min-height: 60vh;
   background: var(--bg-0);
+  padding-block-start: 128px;
+}
+
+.works__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding-inline: var(--pad-x);
+}
+
+.works__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.works__label {
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--text-2);
+}
+
+.works__filters {
+  display: flex;
+  gap: 20px;
+}
+
+.works__filter {
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  padding: 4px 0;
+  background: none;
+  border: none;
+  transition: color var(--dur-fast) ease;
+}
+
+.works__filter:hover {
+  color: var(--text-2);
+}
+
+.works__filter.is-active {
+  color: var(--text-1);
+  text-decoration: underline;
+  text-underline-offset: 8px;
+  text-decoration-thickness: 1px;
+}
+
+.works__grid {
+  margin-block-start: 48px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+
+@media (min-width: 900px) {
+  .works__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 56px 32px;
+  }
+  .workcard--featured {
+    grid-column: 1 / -1;
+  }
 }
