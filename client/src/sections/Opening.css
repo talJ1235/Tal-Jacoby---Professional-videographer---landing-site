@@ -2,6 +2,73 @@
   position: relative;
   height: 100svh;
   min-height: 100svh;
-  background: var(--bg-0);
+  background-color: var(--bg-1);
   overflow: hidden;
+}
+
+/* When the video errors we paint the poster as a cover background */
+.opening--fallback {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.opening__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.opening__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--hero-scrim);
+  pointer-events: none;
+}
+
+.opening__text {
+  position: absolute;
+  inset-inline-start: var(--pad-x);
+  inset-block-end: calc(var(--pad-x) + env(safe-area-inset-bottom));
+  inset-inline-end: var(--pad-x);
+  max-width: 100%;
+}
+
+.opening__name {
+  font-size: var(--fs-hero-name);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+
+.opening__sub {
+  margin-block-start: 12px;
+  font-size: var(--fs-hero-sub);
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+/* Scroll cue — a thin vertical line that breathes */
+.opening__cue {
+  position: absolute;
+  inset-block-end: 24px;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  width: 1px;
+  height: 48px;
+  background: var(--text-3);
+  transform-origin: top;
+  animation: opening-cue 2.4s ease-in-out infinite;
+}
+
+@keyframes opening-cue {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.5; }
+  50%      { transform: scaleY(1);    opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opening__cue { display: none; }
 }
