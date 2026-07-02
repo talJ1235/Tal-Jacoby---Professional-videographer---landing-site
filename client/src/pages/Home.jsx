@@ -1,33 +1,17 @@
 import { Layout } from '../components/layout/Layout';
-import { Hero } from '../sections/Hero';
-import { About } from '../sections/About';
-import { Portfolio } from '../sections/Portfolio';
-import { Contact } from '../sections/Contact';
-import { SectionDots } from '../components/ui/SectionDots';
-import { useSectionScroll } from '../hooks/useSectionScroll';
-import './Home.css';
-
-function SectionSep() {
-  return (
-    <div className="section-sep" aria-hidden="true">
-      <span className="section-sep__gem" />
-    </div>
-  );
-}
+import { Opening } from '../sections/Opening';
+import { Works } from '../sections/Works';
+import { Footer } from '../components/layout/Footer';
+import { useLenis } from '../hooks/useLenis';
 
 export function Home() {
-  useSectionScroll();
+  useLenis();
 
   return (
     <Layout>
-      <SectionDots />
-      <Hero />
-      <SectionSep />
-      <About />
-      <SectionSep />
-      <Portfolio />
-      <SectionSep />
-      <Contact />
+      <Opening />
+      <Works />
+      <Footer />
     </Layout>
   );
 }

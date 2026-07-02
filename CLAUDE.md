@@ -1,51 +1,30 @@
-# Tal Jacoby — Landing Site
+# Tal Jacoby Portfolio — Claude Code Instructions
 
-## Project overview
-Full-stack photographer/videographer portfolio landing page.
-- **Frontend**: React 18 + Vite, Framer Motion, RTL Hebrew layout (`dir="rtl"`)
-- **Backend**: Node.js + Express, Prisma ORM, SQLite
-- **Dev ports**: frontend `5173`, backend `3001`
+## Skills (read before working)
+@.claude/skills/portfolio-site.md        ← project identity, wins all conflicts
+@.claude/skills/frontend-design.md
+@.claude/skills/react-architecture.md
+@.claude/skills/performance-optimization.md
 
-## Dev commands
-```bash
-cd server && npm run dev   # backend on :3001
-cd client && npm run dev   # frontend on :5173
-```
+## Project
+Monorepo: client/ (React 18 + Vite + plain CSS tokens + Framer Motion + Lenis)
+and server/ (Express + Prisma + /admin CRM — DO NOT TOUCH).
+Single-page public site, Hebrew RTL, dark grayscale, work-first.
+Sections: Opening (fullscreen showreel) → Works (grid + fullscreen morph player) → Footer.
 
-## Key files
-| File | Purpose |
-|------|---------|
-| `client/src/styles/THEME.css` | **Single source of truth for all colors** |
-| `client/src/hooks/useSectionScroll.js` | Section scroll (RAF + easeOutExpo, 1200ms) |
-| `client/src/utils/smoothScroll.js` | Shared scroll utility used by Navbar |
-| `client/src/sections/Portfolio.jsx` | Edit `PORTFOLIO_ITEMS` to add YouTube video IDs |
-| `client/src/sections/Contact.jsx` | Contact section + form + social links |
-| `client/public/logo-navbar.png` | Navbar logo (white on transparent) |
-| `client/public/favicon.png` | Browser tab icon |
+## Key rules
+- Stack is frozen: no GSAP, no Tailwind, no UI kits, no new deps without asking.
+- Content source of truth: src/data/works.js. Media under client/public/media/.
+- Palette/typography/motion come ONLY from tokens.css per portfolio-site.md.
+- After every task: build → verify → commit → HANDOFF SUMMARY.
+- If a referenced file name doesn't exist, find the equivalent in the repo and
+  adapt — never scaffold a duplicate.
 
-## Architecture notes
-- `useSectionScroll` intercepts wheel events on desktop (>768px), animates with RAF + `easeOutExpo` over 1200ms
-- No footer — social links and copyright are inside the Contact section
-- All sections use `min-height: 100vh` + Framer Motion `whileInView` entry animations
-- Portfolio thumbnails: `https://img.youtube.com/vi/{youtubeId}/maxresdefault.jpg`
-
-## GitHub — Auto-push after every change
-Remote: `https://github.com/talJ1235/Tal-Jacoby---Professional-videographer---landing-site.git`
-
-**After every code change, automatically run:**
-```bash
-git add -A
-git commit -m "<short description of change>"
-git push origin master:main
-```
-Do this immediately after finishing each task — no need to ask the user for permission to push.
-
-## Security rules
-- Never commit `.env` files with real secrets
-- `.env.example` files must use `CHANGE_ME_...` placeholders only
-- `.claude/` folder is gitignored — never stage it
-- README.md on GitHub is intentionally minimal — do not add technical details
-
-## Vercel deployment
-- Root directory: `client` | Build: `npm run build` | Output: `dist`
-- Env var: `VITE_WHATSAPP_NUMBER=972547713317`
+## Project operations (preserved from the previous build)
+- Dev: `cd server && npm run dev` (:3001) · `cd client && npm run dev` (:5173)
+- Build (public site): `cd client && npm run build` → outputs `dist`.
+- Deploy: Vercel — root directory `client`, build `npm run build`, output `dist`.
+- GitHub remote: `talJ1235/Tal-Jacoby---Professional-videographer---landing-site`
+  (deploys `master`→`main`). Pushing triggers a live deploy — only push when asked.
+- Security: never commit real `.env` secrets; `.env.example` uses `CHANGE_ME_...`
+  placeholders. `.claude/` is gitignored. Keep the public GitHub README minimal.

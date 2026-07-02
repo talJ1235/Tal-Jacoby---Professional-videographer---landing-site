@@ -9,15 +9,14 @@
 html {
   direction: rtl;
   font-size: 16px;
+  scroll-behavior: auto; /* Lenis handles smooth scroll */
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Remove browser smooth-scroll — our custom RAF scroll handles it on desktop */
-html { scroll-behavior: auto; }
-
 body {
-  font-family: var(--font-body);
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  font-family: var(--font);
+  background-color: var(--bg-0);
+  color: var(--text-1);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -25,8 +24,9 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+  font-family: var(--font);
   line-height: 1.2;
+  font-weight: 400;
 }
 
 a {
@@ -34,67 +34,39 @@ a {
   text-decoration: none;
 }
 
-img {
+img, video {
   max-width: 100%;
   display: block;
 }
 
 button {
-  font-family: var(--font-body);
+  font-family: var(--font);
   cursor: pointer;
   border: none;
   background: none;
+  color: inherit;
 }
 
 input, textarea, select {
-  font-family: var(--font-body);
+  font-family: var(--font);
 }
 
 ul, ol {
   list-style: none;
 }
 
-/* Grain texture overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  pointer-events: none;
-  z-index: var(--z-base);
-  opacity: 0.4;
+::selection {
+  background: var(--text-1);
+  color: var(--bg-0);
 }
 
-/* GPU hint for sections — desktop only (causes compositing issues on mobile) */
-@media (min-width: 769px) {
-  section { will-change: transform; }
+/* Visible, consistent focus for keyboard users */
+:focus-visible {
+  outline: 1px solid var(--text-1);
+  outline-offset: 4px;
 }
 
-/* Section base */
-.section {
-  padding: var(--space-24) var(--space-6);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.section-full {
-  padding: var(--space-24) var(--space-6);
-}
-
-/* Mobile section padding */
-@media (max-width: 768px) {
-  .section {
-    padding: var(--space-12) var(--space-5);
-  }
-  .section-full {
-    padding: var(--space-12) var(--space-5);
-  }
-}
-
-/* Scrollbar — hidden on desktop (section-scroll only), visible on mobile */
-@media (min-width: 769px) {
-  html { scrollbar-width: none; -ms-overflow-style: none; }
-  ::-webkit-scrollbar { display: none; width: 0; }
-}
+/* When Lenis is active it sets html.lenis; keep native scroll when reduced-motion */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: clip; }
