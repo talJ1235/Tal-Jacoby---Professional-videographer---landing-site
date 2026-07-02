@@ -25,17 +25,18 @@ export function Works() {
     [filter]
   );
 
-  const handleOpen = (work) => {
-    openerRef.current = document.activeElement;
+  const handleOpen = (work, el) => {
+    openerRef.current = el || document.activeElement;
     setExpanded(work);
   };
 
   const handleClose = () => {
-    setExpanded(null);
-    // Return focus to the card that opened the player.
+    // Return focus to the card that opened the player, after the overlay has
+    // unmounted (otherwise the removed close button drops focus back to body).
     const opener = openerRef.current;
+    setExpanded(null);
     if (opener && typeof opener.focus === 'function') {
-      requestAnimationFrame(() => opener.focus());
+      setTimeout(() => opener.focus(), 60);
     }
   };
 
@@ -88,11 +89,9 @@ export function Works() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {expanded && (
-          <PlayerOverlay key={expanded.id} work={expanded} onClose={handleClose} />
-        )}
-      </AnimatePresence>
+      {expanded && (
+        <PlayerOverlay key={expanded.id} work={expanded} onClose={handleClose} />
+      )}
     </section>
   );
 }

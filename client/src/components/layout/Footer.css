@@ -21,6 +21,9 @@
 
 .footer__link {
   color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   transition: color var(--dur-fast) ease;
 }
 

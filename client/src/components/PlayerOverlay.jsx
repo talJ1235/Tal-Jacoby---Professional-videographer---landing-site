@@ -9,38 +9,49 @@ function embedSrc(id) {
   return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
 }
 
+// Opens with a shared-layoutId morph out of the clicked card, then fades the
+// YouTube iframe in. Closes with a self-contained fade + unmount (no reliance on
+// AnimatePresence exit, which hangs when mixed with the shared-layout morph).
 export function PlayerOverlay({ work, onClose }) {
   const reduce =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const [iframeReady, setIframeReady] = useState(reduce); // crossfade shows iframe at once
+  const [iframeReady, setIframeReady] = useState(reduce);
+  const [closing, setClosing] = useState(false);
   const closeRef = useRef(null);
   const rootRef = useRef(null);
   const closingRef = useRef(false);
+  const pushedRef = useRef(false);
 
-  // Teardown: fade the iframe out (audio stops), then let the parent unmount us.
-  const teardown = () => {
+  // Fade out (audio stops as the iframe unmounts), then let the parent remove us.
+  const close = () => {
     if (closingRef.current) return;
     closingRef.current = true;
     setIframeReady(false);
-    setTimeout(onClose, reduce ? 0 : 150);
+    setClosing(true);
+    setTimeout(onClose, reduce ? 0 : 200);
   };
 
-  // History integration: opening pushes a state; any close goes through popstate,
-  // so the mobile back button and our own buttons share one path.
+  // User-driven close: pop our history entry so the mobile back button and our
+  // buttons share one path; the popstate listener runs the actual teardown.
+  const dismiss = () => {
+    if (closingRef.current) return;
+    if (window.history.state && window.history.state.player) window.history.back();
+    else close();
+  };
+
+  // History integration (guarded so StrictMode's double-invoke pushes only once).
   useEffect(() => {
-    window.history.pushState({ player: work.id }, '');
-    const onPop = () => teardown();
+    if (!pushedRef.current) {
+      window.history.pushState({ player: work.id }, '');
+      pushedRef.current = true;
+    }
+    const onPop = () => close();
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const dismiss = () => {
-    if (closingRef.current) return;
-    window.history.back(); // fires popstate → teardown
-  };
 
   // Scroll lock + focus management.
   useEffect(() => {
@@ -53,7 +64,6 @@ export function PlayerOverlay({ work, onClose }) {
         e.preventDefault();
         dismiss();
       } else if (e.key === 'Tab') {
-        // minimal focus trap within the overlay (includes the close button)
         const focusables = rootRef.current
           ? rootRef.current.querySelectorAll('button, iframe, a[href]')
           : [];
@@ -92,7 +102,6 @@ export function PlayerOverlay({ work, onClose }) {
             className="player__iframe"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             src={embedSrc(work.youtubeId)}
             title={work.title}
@@ -119,9 +128,8 @@ export function PlayerOverlay({ work, onClose }) {
       <motion.div
         className="player__backdrop"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: reduce ? 0.2 : 0.45 }}
+        animate={{ opacity: closing ? 0 : 1 }}
+        transition={{ duration: reduce ? 0.2 : closing ? 0.2 : 0.45 }}
         aria-hidden="true"
       />
 
@@ -130,8 +138,7 @@ export function PlayerOverlay({ work, onClose }) {
           <motion.div
             className="player__frame"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            animate={{ opacity: closing ? 0 : 1 }}
             transition={{ duration: 0.2 }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -140,8 +147,9 @@ export function PlayerOverlay({ work, onClose }) {
         ) : (
           <motion.div
             className="player__frame"
-            layoutId={`work-${work.id}`}
-            transition={MORPH}
+            layoutId={closing ? undefined : `work-${work.id}`}
+            animate={{ opacity: closing ? 0 : 1 }}
+            transition={closing ? { duration: 0.2 } : MORPH}
             onLayoutAnimationComplete={() => setIframeReady(true)}
             onClick={(e) => e.stopPropagation()}
           >

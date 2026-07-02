@@ -1,10 +1,10 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import './WorkCard.css';
 
 const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
 
-function WorkCardBase({ work, index, onOpen, buttonRef, className = '', anim }) {
+function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
   const { id, title, tag, thumb, preview } = work;
 
   const videoRef = useRef(null);
@@ -68,10 +68,10 @@ function WorkCardBase({ work, index, onOpen, buttonRef, className = '', anim }) 
 
   return (
     <motion.button
-      ref={buttonRef}
+      ref={ref}
       type="button"
       className={`workcard ${className}`.trim()}
-      onClick={() => onOpen(work)}
+      onClick={(e) => onOpen(work, e.currentTarget)}
       onMouseEnter={fineHover}
       onMouseLeave={fineLeave}
       aria-label={`${title} — פתח נגן`}
@@ -108,4 +108,4 @@ function WorkCardBase({ work, index, onOpen, buttonRef, className = '', anim }) 
   );
 }
 
-export const WorkCard = memo(WorkCardBase);
+export const WorkCard = memo(forwardRef(WorkCardBase));
