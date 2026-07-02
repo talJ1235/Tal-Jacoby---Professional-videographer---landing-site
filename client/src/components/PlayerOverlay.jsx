@@ -16,7 +16,7 @@ export function PlayerOverlay({ work, onClose }) {
 
   const [iframeReady, setIframeReady] = useState(reduce); // crossfade shows iframe at once
   const closeRef = useRef(null);
-  const stageRef = useRef(null);
+  const rootRef = useRef(null);
   const closingRef = useRef(false);
 
   // Teardown: fade the iframe out (audio stops), then let the parent unmount us.
@@ -53,9 +53,9 @@ export function PlayerOverlay({ work, onClose }) {
         e.preventDefault();
         dismiss();
       } else if (e.key === 'Tab') {
-        // minimal focus trap within the overlay
-        const focusables = stageRef.current
-          ? stageRef.current.querySelectorAll('button, iframe, a[href]')
+        // minimal focus trap within the overlay (includes the close button)
+        const focusables = rootRef.current
+          ? rootRef.current.querySelectorAll('button, iframe, a[href]')
           : [];
         if (!focusables.length) return;
         const first = focusables[0];
@@ -114,6 +114,7 @@ export function PlayerOverlay({ work, onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label={work.title}
+      ref={rootRef}
     >
       <motion.div
         className="player__backdrop"
@@ -121,10 +122,10 @@ export function PlayerOverlay({ work, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: reduce ? 0.2 : 0.45 }}
-        onClick={dismiss}
+        aria-hidden="true"
       />
 
-      <div className="player__stage" ref={stageRef}>
+      <div className="player__stage" onClick={dismiss}>
         {reduce ? (
           <motion.div
             className="player__frame"

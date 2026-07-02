@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { useLeads } from '../hooks/useLeads';
 import { getLeads } from '../services/api';
 import { formatDate } from '../utils';
+import '../styles/admin-tokens.css';
 import './Admin.css';
 
 const STATUSES = ['חדש', 'בטיפול', 'סגור'];

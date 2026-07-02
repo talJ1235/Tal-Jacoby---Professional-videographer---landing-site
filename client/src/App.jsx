@@ -1,7 +1,12 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Home } from './pages/Home';
-import { Admin } from './pages/Admin';
+
+// Admin (CRM) is code-split so its deps (xlsx, axios) never load on the public route.
+const Admin = lazy(() =>
+  import('./pages/Admin').then((m) => ({ default: m.Admin }))
+);
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -16,7 +21,14 @@ function AnimatedRoutes() {
       >
         <Routes location={location}>
           <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route
+            path="/admin"
+            element={
+              <Suspense fallback={null}>
+                <Admin />
+              </Suspense>
+            }
+          />
         </Routes>
       </motion.div>
     </AnimatePresence>

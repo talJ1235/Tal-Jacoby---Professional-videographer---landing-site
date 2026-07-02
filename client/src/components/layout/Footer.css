@@ -1,5 +1,31 @@
 .footer {
   border-top: 1px solid var(--border);
-  min-height: 120px;
   background: var(--bg-0);
+}
+
+.footer__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 96px var(--pad-x) 48px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 32px;
+  font-size: var(--fs-footer);
+}
+
+.footer__name {
+  color: var(--text-1);
+  font-weight: 500;
+}
+
+.footer__link {
+  color: var(--text-2);
+  transition: color var(--dur-fast) ease;
+}
+
+.footer__link:hover {
+  color: var(--text-1);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }

@@ -1,0 +1,28 @@
+/* ─── Admin (CRM) tokens ────────────────────────────────────────────────────
+   Scoped to the /admin chunk only (imported by Admin.jsx). Keeps the internal
+   CRM styled after the public site moved to the grayscale token set.
+   Values resolved from the previous THEME.css. --font-heading maps to Heebo so
+   the public "Heebo only" font policy holds and no second family is loaded. */
+
+:root {
+  --color-text:        #F0EDE8;
+  --color-text-muted:  #A09890;
+  --color-border:      rgba(255, 255, 255, 0.08);
+  --color-gold:        #FF6B4A;
+  --color-gold-dark:   #CC4B2A;
+
+  --font-body:    'Heebo', sans-serif;
+  --font-heading: 'Heebo', sans-serif;
+
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-8:  32px;
+  --space-12: 48px;
+
+  --radius-full: 9999px;
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  --duration-base: 300ms;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
