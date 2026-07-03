@@ -6,12 +6,23 @@ import './WorkCard.css';
 const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
 
 function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
-  const { id, title, tag, thumb, preview } = work;
+  const { id, title, tag, thumb, preview, youtubeId } = work;
+
+  // Thumbnail fallback chain: local WebP → YouTube maxres → hqdefault → gray box.
+  // Lets the live site look real immediately from YouTube, while an uploaded
+  // graded still (thumb.webp) overrides it automatically once present.
+  const thumbCandidates = [];
+  if (thumb) thumbCandidates.push(thumb);
+  if (youtubeId) {
+    thumbCandidates.push(`https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg`);
+    thumbCandidates.push(`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`);
+  }
 
   const videoRef = useRef(null);
   const srcSetRef = useRef(false);
   const [active, setActive] = useState(false);   // preview showing / scaled
-  const [thumbFailed, setThumbFailed] = useState(false);
+  const [srcIdx, setSrcIdx] = useState(0);
+  const thumbFailed = srcIdx >= thumbCandidates.length;
 
   const reduce =
     IS_PREVIEW ||
@@ -84,11 +95,11 @@ function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
           {!thumbFailed && (
             <img
               className="workcard__thumb"
-              src={thumb}
+              src={thumbCandidates[srcIdx]}
               alt={title}
               loading={index < 2 ? 'eager' : 'lazy'}
               decoding="async"
-              onError={() => setThumbFailed(true)}
+              onError={() => setSrcIdx((i) => i + 1)}
             />
           )}
           <video
