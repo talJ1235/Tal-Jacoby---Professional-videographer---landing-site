@@ -58,5 +58,25 @@
     "thumb": "/media/works/work-6/thumb.webp",
     "preview": "/media/works/work-6/preview.mp4",
     "published": true
+  },
+  {
+    "id": "work-7",
+    "title": "מערכת רואה יורה",
+    "tag": "פרויקט הנדסי · תיעוד ופיתוח",
+    "category": "business",
+    "youtubeId": "IjAfqCEwon0",
+    "thumb": "/media/works/work-7/thumb.webp",
+    "preview": "/media/works/work-7/preview.mp4",
+    "published": true
+  },
+  {
+    "id": "work-8",
+    "title": "סיכום בת מצווה",
+    "tag": "צילום אירועים · בת מצווה",
+    "category": "events",
+    "youtubeId": "0OL1JovRuvY",
+    "thumb": "/media/works/work-8/thumb.webp",
+    "preview": "/media/works/work-8/preview.mp4",
+    "published": true
   }
 ]
