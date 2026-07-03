@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { works } from '../data/works';
+import { useContent } from '../content/useContent';
+import { IS_PREVIEW } from '../content/previewMode';
 import { WorkCard } from '../components/WorkCard';
 import { PlayerOverlay } from '../components/PlayerOverlay';
 import './Works.css';
@@ -17,12 +18,16 @@ export function Works() {
   const openerRef = useRef(null);
 
   const reduce =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    IS_PREVIEW ||
+    (typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const { works: allWorks } = useContent();
+  const published = useMemo(() => allWorks.filter((w) => w.published !== false), [allWorks]);
 
   const filtered = useMemo(
-    () => (filter === 'all' ? works : works.filter((w) => w.category === filter)),
-    [filter]
+    () => (filter === 'all' ? published : published.filter((w) => w.category === filter)),
+    [filter, published]
   );
 
   const handleOpen = (work, el) => {

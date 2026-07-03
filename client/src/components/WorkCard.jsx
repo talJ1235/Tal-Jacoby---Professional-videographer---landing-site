@@ -1,5 +1,6 @@
 import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { IS_PREVIEW } from '../content/previewMode';
 import './WorkCard.css';
 
 const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
@@ -13,8 +14,9 @@ function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
   const [thumbFailed, setThumbFailed] = useState(false);
 
   const reduce =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    IS_PREVIEW ||
+    (typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   // Assign the preview src only once, the first time it's needed.
   const ensureSrc = () => {

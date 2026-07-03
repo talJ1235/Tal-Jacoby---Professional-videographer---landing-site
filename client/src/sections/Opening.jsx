@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import site from '@content/site.json';
+import { useContent } from '../content/useContent';
+import { IS_PREVIEW } from '../content/previewMode';
 import './Opening.css';
 
 const SHOWREEL = '/media/showreel/showreel.mp4';
 const POSTER = '/media/showreel/poster.jpg';
 
 export function Opening() {
+  const { site } = useContent();
   const sectionRef = useRef(null);
   const videoRef = useRef(null);
   const [videoFailed, setVideoFailed] = useState(false);
 
   const reduce =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    IS_PREVIEW ||
+    (typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   // Pause the video when the section leaves the viewport (battery).
   useEffect(() => {

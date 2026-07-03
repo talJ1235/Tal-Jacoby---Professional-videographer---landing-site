@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { useLeads } from '../hooks/useLeads';
 import { getLeads } from '../services/api';
 import { formatDate } from '../utils';
+import { ContentEditor } from './content/ContentEditor';
 import '../styles/admin-tokens.css';
 import './Admin.css';
 
@@ -135,6 +136,7 @@ function ConfirmBtn({ confirmText, onConfirm, children, className }) {
 // ── Main Admin ─────────────────────────────────────────────────
 export function Admin() {
   const [password, setPassword]         = useState(() => sessionStorage.getItem('admin_pw') || '');
+  const [panel, setPanel]               = useState('leads'); // 'leads' | 'content'
   const [activeTab, setActiveTab]       = useState('active');
   const [search, setSearch]             = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -184,10 +186,19 @@ export function Admin() {
   return (
     <div className="admin">
       <header className="admin-header">
-        <h1 className="admin-logo">טל יעקבי — ניהול לידים</h1>
+        <h1 className="admin-logo">טל יעקבי — ניהול</h1>
+        <div className="admin-panels">
+          <button className={`admin-panel-tab${panel === 'leads' ? ' is-active' : ''}`} onClick={() => setPanel('leads')}>לידים</button>
+          <button className={`admin-panel-tab${panel === 'content' ? ' is-active' : ''}`} onClick={() => setPanel('content')}>תוכן</button>
+        </div>
         <button className="admin-logout" onClick={() => { sessionStorage.removeItem('admin_pw'); setPassword(''); }}>יציאה</button>
       </header>
 
+      {panel === 'content' ? (
+        <div className="admin-body">
+          <ContentEditor password={password} />
+        </div>
+      ) : (
       <div className="admin-body">
         <StatsBar leads={normalizedLeads} />
 
@@ -352,6 +363,7 @@ export function Admin() {
           </>
         )}
       </div>
+      )}
     </div>
   );
 }

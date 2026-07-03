@@ -1,8 +1,9 @@
-import site from '@content/site.json';
+import { useContent } from '../../content/useContent';
 import './Footer.css';
 
 // Contact values come from content/site.json (edited via /admin → תוכן).
 export function Footer() {
+  const { site } = useContent();
   const { email, phone, instagram } = site.footer;
   return (
     <footer className="footer" aria-label="פרטי קשר">

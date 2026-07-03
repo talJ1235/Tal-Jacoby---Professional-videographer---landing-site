@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
 import { setLenis } from '../lib/scroll';
+import { IS_PREVIEW } from '../content/previewMode';
 
 // Initializes Lenis smooth scrolling for the public site.
-// Skips entirely under prefers-reduced-motion (native scroll only).
+// Skips under prefers-reduced-motion and in the editor preview iframe.
 export function useLenis() {
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
+    if (reduce || IS_PREVIEW) return;
 
     const lenis = new Lenis();
     setLenis(lenis);

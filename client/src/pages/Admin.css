@@ -103,6 +103,27 @@
   letter-spacing: 0.02em;
 }
 
+.admin-panels {
+  display: flex;
+  gap: 6px;
+}
+.admin-panel-tab {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  padding: 7px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+}
+.admin-panel-tab.is-active {
+  background: #FF6B4A;
+  border-color: #FF6B4A;
+  color: #1a0f0a;
+  font-weight: 600;
+}
+
 .admin-logout {
   color: rgba(255,255,255,0.45);
   font-size: 0.85rem;
