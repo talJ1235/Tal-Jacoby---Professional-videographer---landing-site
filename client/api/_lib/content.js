@@ -45,6 +45,7 @@ export function base64Bytes(b64) {
 // Validates the works array. Returns an error string (Hebrew) or null if valid.
 export function validateWorks(works) {
   if (!Array.isArray(works)) return 'רשימת העבודות אינה תקינה.';
+  if (works.length === 0) return 'חייבת להיות לפחות עבודה אחת.';
   const ids = new Set();
   for (const w of works) {
     if (!w || typeof w !== 'object') return 'עבודה אחת אינה תקינה.';
@@ -52,6 +53,10 @@ export function validateWorks(works) {
       if (typeof w[f] !== 'string' || !w[f].trim()) {
         return `בעבודה "${w.title || w.id || '—'}" חסר שדה חובה: ${f}.`;
       }
+    }
+    // id must be a filesystem/URL-safe slug (used in media paths + layout ids)
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(w.id)) {
+      return `מזהה עבודה לא תקין: "${w.id}" (אותיות לטיניות קטנות, ספרות ומקפים בלבד).`;
     }
     if (!CATEGORIES.includes(w.category)) {
       return `בעבודה "${w.title}" קטגוריה לא תקינה (אירועים / עסקים / אווירי).`;

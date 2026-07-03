@@ -13,6 +13,21 @@ const FILTERS = [
   { id: 'aerial', label: 'אווירי' },
 ];
 
+const VALID_CATEGORIES = ['events', 'business', 'aerial'];
+
+// Defensive: a malformed work (bad shape / missing id / unknown category) is
+// skipped rather than allowed to crash the grid.
+function isRenderableWork(w) {
+  return (
+    w &&
+    typeof w === 'object' &&
+    typeof w.id === 'string' &&
+    w.id.length > 0 &&
+    typeof w.title === 'string' &&
+    VALID_CATEGORIES.includes(w.category)
+  );
+}
+
 export function Works() {
   const [filter, setFilter] = useState('all');
   const [expanded, setExpanded] = useState(null);
@@ -24,7 +39,10 @@ export function Works() {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   const { works: allWorks } = useContent();
-  const published = useMemo(() => allWorks.filter((w) => w.published !== false), [allWorks]);
+  const published = useMemo(
+    () => (Array.isArray(allWorks) ? allWorks : []).filter((w) => isRenderableWork(w) && w.published !== false),
+    [allWorks]
+  );
 
   const filtered = useMemo(
     () => (filter === 'all' ? published : published.filter((w) => w.category === filter)),
