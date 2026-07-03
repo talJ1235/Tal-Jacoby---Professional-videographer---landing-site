@@ -48,6 +48,19 @@ export function SiteTexts({ site, onChange }) {
         </label>
 
         <label className="cw-field">
+          <span>שם מותג (פוטר + זכויות יוצרים)</span>
+          <input value={site.brandName || ''} onChange={(e) => onChange({ brandName: e.target.value })} />
+        </label>
+        <label className="cw-field">
+          <span>שורת פתיחה בפוטר (ריק = מוסתר)</span>
+          <input
+            value={site.contactHeading || ''}
+            placeholder="נעים להכיר"
+            onChange={(e) => onChange({ contactHeading: e.target.value })}
+          />
+        </label>
+
+        <label className="cw-field">
           <span>אימייל (פוטר)</span>
           <input
             value={f.email || ''}

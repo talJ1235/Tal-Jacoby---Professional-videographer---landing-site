@@ -6,11 +6,23 @@
 .footer__inner {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 96px var(--pad-x) 48px;
+  padding: 72px var(--pad-x) 40px;
+  text-align: center;
+}
+
+.footer__heading {
+  font-size: var(--fs-hero-sub);
+  color: var(--text-1);
+  font-weight: 400;
+  margin-block-end: 24px;
+}
+
+.footer__contact {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 32px;
+  justify-content: center;
+  gap: 12px 28px;
   font-size: var(--fs-footer);
 }
 
@@ -31,4 +43,16 @@
   color: var(--text-1);
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+.footer__divider {
+  height: 1px;
+  background: var(--border);
+  margin-block: 24px;
+}
+
+.footer__copy {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
 }
