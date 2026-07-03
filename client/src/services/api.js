@@ -34,3 +34,13 @@ export const deleteLead = (password, id) =>
 
 export const exportCsv = (password) =>
   adminApi(password).get('/api/leads/export/csv', { responseType: 'blob' });
+
+// Content editor (admin → תוכן)
+export const getContentState = (password) =>
+  adminApi(password).get('/api/content/state');
+
+export const uploadContentBlob = (password, path, base64) =>
+  adminApi(password).post('/api/content/blob', { path, base64 });
+
+export const publishContent = (password, payload) =>
+  adminApi(password).post('/api/content/publish', payload);
