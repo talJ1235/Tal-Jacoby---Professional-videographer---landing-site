@@ -48,5 +48,15 @@
     "thumb": "/media/works/beit-shean-aerial/thumb.webp",
     "preview": "/media/works/beit-shean-aerial/preview.mp4",
     "published": true
+  },
+  {
+    "id": "work-6",
+    "title": " קו מגן · מערכת אבטחה אוטונומית",
+    "tag": "פרויקט הנדסי · תיעוד ופיתוח",
+    "category": "business",
+    "youtubeId": "l2cBFh73ftc",
+    "thumb": "/media/works/work-6/thumb.webp",
+    "preview": "/media/works/work-6/preview.mp4",
+    "published": true
   }
 ]
