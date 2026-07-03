@@ -5,15 +5,20 @@ const MODES = {
   mobile: { w: 375, h: 780, label: 'מובייל' },
 };
 
+const PREVIEW_URL = () => `${window.location.origin}/?preview=1`;
+
 // Live preview of the real public site, rendered from the editor's DRAFT via
-// postMessage into an iframe loaded at /?preview=1. Scaled to fit the column.
+// postMessage into a same-origin iframe (/?preview=1). Scaled to fit the column.
+// If framing is blocked (e.g. a CSP change), a fallback offers a new-tab preview.
 export function PreviewPane({ draft }) {
   const iframeRef = useRef(null);
   const wrapRef = useRef(null);
   const draftRef = useRef(draft);
   draftRef.current = draft;
+  const readyRef = useRef(false);
 
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [mode, setMode] = useState('desktop');
   const [scale, setScale] = useState(1);
 
@@ -31,12 +36,21 @@ export function PreviewPane({ draft }) {
     const onMsg = (e) => {
       if (e.origin !== window.location.origin) return;
       if (e.data && e.data.type === 'preview:ready') {
+        readyRef.current = true;
         setReady(true);
+        setFailed(false);
         send();
       }
     };
     window.addEventListener('message', onMsg);
-    return () => window.removeEventListener('message', onMsg);
+    // If framing is blocked, the handshake never arrives → show fallback.
+    const timer = setTimeout(() => {
+      if (!readyRef.current) setFailed(true);
+    }, 4000);
+    return () => {
+      window.removeEventListener('message', onMsg);
+      clearTimeout(timer);
+    };
   }, []);
 
   // Push draft on every change once ready.
@@ -76,15 +90,28 @@ export function PreviewPane({ draft }) {
         </div>
       </div>
       <div className="ce-preview__wrap" ref={wrapRef}>
-        <div className="ce-preview__scaler" style={{ width: w * scale, height: h * scale }}>
-          <iframe
-            ref={iframeRef}
-            src="/?preview=1"
-            title="תצוגה מקדימה של האתר"
-            onLoad={send}
-            style={{ width: w, height: h, transform: `scale(${scale})` }}
-          />
-        </div>
+        {failed ? (
+          <div className="ce-preview__fallback">
+            <p>לא ניתן להציג את התצוגה המקדימה כאן.</p>
+            <button
+              type="button"
+              className="ce-preview__fallback-btn"
+              onClick={() => window.open(PREVIEW_URL(), '_blank', 'noopener')}
+            >
+              פתח תצוגה מקדימה בכרטיסייה חדשה
+            </button>
+          </div>
+        ) : (
+          <div className="ce-preview__scaler" style={{ width: w * scale, height: h * scale }}>
+            <iframe
+              ref={iframeRef}
+              src="/?preview=1"
+              title="תצוגה מקדימה של האתר"
+              onLoad={send}
+              style={{ width: w, height: h, transform: `scale(${scale})` }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
