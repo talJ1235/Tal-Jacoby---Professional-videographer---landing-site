@@ -1,5 +1,8 @@
 .content-editor {
-  padding-bottom: 96px; /* room for sticky publish bar */
+  padding: 24px 24px 96px; /* room for sticky publish bar */
+  background: #141210;      /* dark panel on the light admin page */
+  border-radius: 12px;
+  color: #f2f2f2;
 }
 
 /* Split view: controls + live preview */
@@ -123,10 +126,11 @@
 }
 .content-section__head h2 {
   font-size: 1.15rem;
-  color: var(--color-text);
+  color: #f2f2f2;
+  font-weight: 600;
 }
 .content-hint {
-  color: var(--color-text-muted);
+  color: #a8a29a;
   font-size: 0.85rem;
   margin-bottom: 16px;
 }
@@ -169,12 +173,12 @@
   gap: 12px;
   background: none;
   border: none;
-  color: var(--color-text);
+  color: #f2f2f2;
   text-align: start;
   cursor: pointer;
   min-height: 32px;
 }
-.cw-row__title { font-weight: 600; }
+.cw-row__title { font-weight: 600; color: #f2f2f2; }
 .cw-row__cat {
   font-size: 0.8rem;
   color: var(--color-text-muted);
@@ -187,7 +191,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.82rem;
-  color: var(--color-text-muted);
+  color: #c4bfb7;
   cursor: pointer;
 }
 .cw-row__chevron { color: var(--color-text-muted); font-size: 0.7rem; }
@@ -205,21 +209,23 @@
   gap: 12px;
 }
 .cw-field { display: flex; flex-direction: column; gap: 4px; }
-.cw-field > span { font-size: 0.8rem; color: var(--color-text-muted); }
+.cw-field > span { font-size: 0.8rem; color: #d8d4ce; font-weight: 500; }
 .cw-field input,
 .cw-field select {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--color-border);
+  background: #1a1a1a;
+  border: 1px solid #333;
   border-radius: 8px;
-  color: var(--color-text);
+  color: #f2f2f2;
   padding: 9px 11px;
   font-family: var(--font-body);
   font-size: 0.92rem;
 }
+.cw-field input::placeholder { color: #8a8a8a; }
 .cw-field input:focus,
 .cw-field select:focus {
   outline: none;
   border-color: var(--color-gold);
+  box-shadow: 0 0 0 2px rgba(255, 107, 74, 0.35);
 }
 .cw-err { color: #ff8a6a; font-size: 0.78rem; font-style: normal; }
 .cw-err--block { white-space: pre-wrap; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; overflow-x: auto; }
