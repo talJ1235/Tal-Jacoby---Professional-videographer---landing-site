@@ -7,10 +7,24 @@ import './Opening.css';
 const SHOWREEL = '/media/showreel/showreel.mp4';
 const POSTER = '/media/showreel/poster.jpg';
 
+// Muted, looping, controls-free YouTube background embed.
+function ytEmbedSrc(id) {
+  const origin = typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : '';
+  return (
+    `https://www.youtube-nocookie.com/embed/${id}` +
+    `?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&playsinline=1` +
+    `&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin=${origin}`
+  );
+}
+
 export function Opening() {
   const { site } = useContent();
+  const heroYoutubeId = site.heroYoutubeId || '';
+  const useYoutube = !!heroYoutubeId;
+
   const sectionRef = useRef(null);
   const videoRef = useRef(null);
+  const iframeRef = useRef(null);
   const [videoFailed, setVideoFailed] = useState(false);
 
   const reduce =
@@ -18,49 +32,85 @@ export function Opening() {
     (typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  // Pause the video when the section leaves the viewport (battery).
+  // Pause the background when the hero leaves the viewport (battery).
   useEffect(() => {
     if (reduce) return;
     const section = sectionRef.current;
-    const video = videoRef.current;
-    if (!section || !video) return;
+    if (!section) return;
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.intersectionRatio < 0.1) {
-          video.pause();
+        const visible = entry.intersectionRatio >= 0.1;
+        if (useYoutube) {
+          const win = iframeRef.current?.contentWindow;
+          if (win) {
+            win.postMessage(
+              JSON.stringify({ event: 'command', func: visible ? 'playVideo' : 'pauseVideo', args: [] }),
+              '*'
+            );
+          }
         } else {
-          video.play().catch(() => {});
+          const v = videoRef.current;
+          if (!v) return;
+          if (visible) v.play().catch(() => {});
+          else v.pause();
         }
       },
       { threshold: [0, 0.1] }
     );
     io.observe(section);
     return () => io.disconnect();
-  }, [reduce]);
+  }, [reduce, useYoutube]);
+
+  let background = null;
+  if (useYoutube && !reduce) {
+    background = (
+      <div className="opening__yt" aria-hidden="true">
+        <iframe
+          ref={iframeRef}
+          src={ytEmbedSrc(heroYoutubeId)}
+          title="רקע וידאו"
+          allow="autoplay; encrypted-media"
+        />
+      </div>
+    );
+  } else if (useYoutube && reduce) {
+    background = (
+      <img
+        className="opening__bg-img"
+        src={`https://i.ytimg.com/vi/${heroYoutubeId}/maxresdefault.jpg`}
+        alt=""
+        aria-hidden="true"
+      />
+    );
+  } else if (!videoFailed) {
+    background = (
+      <video
+        ref={videoRef}
+        className="opening__video"
+        src={SHOWREEL}
+        poster={POSTER}
+        autoPlay={!reduce}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onError={() => setVideoFailed(true)}
+      />
+    );
+  }
+
+  const showreelFallback = !useYoutube && videoFailed;
 
   return (
     <section
       ref={sectionRef}
       id="opening"
-      className={`opening${videoFailed ? ' opening--fallback' : ''}`}
+      className={`opening${showreelFallback ? ' opening--fallback' : ''}`}
       aria-label="פתיח"
-      style={videoFailed ? { backgroundImage: `url(${POSTER})` } : undefined}
+      style={showreelFallback ? { backgroundImage: `url(${POSTER})` } : undefined}
     >
-      {!videoFailed && (
-        <video
-          ref={videoRef}
-          className="opening__video"
-          src={SHOWREEL}
-          poster={POSTER}
-          autoPlay={!reduce}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          onError={() => setVideoFailed(true)}
-        />
-      )}
+      {background}
 
       <div className="opening__scrim" aria-hidden="true" />
 

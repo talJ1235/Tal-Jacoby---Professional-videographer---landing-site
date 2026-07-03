@@ -80,6 +80,10 @@ export function validateSite(site) {
   for (const f of ['heroName', 'heroSubtitle', 'seoTitle', 'seoDescription']) {
     if (typeof site[f] !== 'string' || !site[f].trim()) return `חסר שדה: ${f}.`;
   }
+  // Optional hero background YouTube id: '' or a valid 11-char id.
+  if (site.heroYoutubeId && !/^[A-Za-z0-9_-]{11}$/.test(site.heroYoutubeId)) {
+    return 'מזהה יוטיוב לרקע הפתיח אינו תקין.';
+  }
   const footer = site.footer || {};
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(footer.email || '')) {
     return 'כתובת אימייל בפוטר אינה תקינה.';

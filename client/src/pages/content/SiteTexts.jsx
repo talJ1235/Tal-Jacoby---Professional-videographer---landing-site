@@ -1,3 +1,5 @@
+import { parseYouTubeId } from './lib';
+
 const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v || '');
 const instaOk = (v) => /^https?:\/\//.test(v || '');
 const phoneOk = (v) => /^\+?[0-9]{9,15}$/.test((v || '').replace(/[\s\-()]/g, ''));
@@ -27,6 +29,14 @@ export function SiteTexts({ site, onChange }) {
         <label className="cw-field">
           <span>כותרת משנה (פתיח)</span>
           <input value={site.heroSubtitle} onChange={(e) => onChange({ heroSubtitle: e.target.value })} />
+        </label>
+        <label className="cw-field">
+          <span>וידאו רקע לפתיח (יוטיוב — ריק = showreel)</span>
+          <input
+            value={site.heroYoutubeId || ''}
+            placeholder="https://youtu.be/… או מזהה"
+            onChange={(e) => onChange({ heroYoutubeId: parseYouTubeId(e.target.value) })}
+          />
         </label>
         <label className="cw-field">
           <span>כותרת SEO (טאב הדפדפן)</span>

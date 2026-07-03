@@ -13,7 +13,8 @@
   background-repeat: no-repeat;
 }
 
-.opening__video {
+.opening__video,
+.opening__bg-img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -21,19 +22,44 @@
   object-fit: cover;
 }
 
+/* YouTube background — cover-fit so no letterbox bars show, non-interactive */
+.opening__yt {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.opening__yt iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100vw, 177.78svh);   /* 16/9 of the height */
+  height: max(100svh, 56.25vw);   /* 9/16 of the width  */
+  border: 0;
+  pointer-events: none;
+}
+
 .opening__scrim {
   position: absolute;
   inset: 0;
-  background: var(--hero-scrim);
+  /* center vignette (for the centered name) layered over the bottom scrim */
+  background:
+    radial-gradient(ellipse at center, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.18) 45%, rgba(10,10,10,0) 72%),
+    var(--hero-scrim);
   pointer-events: none;
 }
 
 .opening__text {
   position: absolute;
-  inset-inline-start: var(--pad-x);
-  inset-block-end: calc(var(--pad-x) + env(safe-area-inset-bottom));
-  inset-inline-end: var(--pad-x);
-  max-width: 100%;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--pad-x);
+  padding-block-end: calc(var(--pad-x) + env(safe-area-inset-bottom));
 }
 
 .opening__name {
