@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import site from '@content/site.json';
 import './Opening.css';
 
 const SHOWREEL = '/media/showreel/showreel.mp4';
@@ -66,8 +67,8 @@ export function Opening() {
         animate={reduce ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
       >
-        <h1 className="opening__name">טל יעקבי</h1>
-        <p className="opening__sub">צילום וידאו · אירועים · עסקים</p>
+        <h1 className="opening__name">{site.heroName}</h1>
+        <p className="opening__sub">{site.heroSubtitle}</p>
       </motion.div>
 
       {!reduce && <div className="opening__cue" aria-hidden="true" />}
