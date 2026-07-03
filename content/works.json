@@ -1,62 +1,52 @@
 [
   {
-    "id": "bat-mitzvah-noa",
-    "title": "בת מצווה · נועה",
-    "tag": "צילום וידאו · נתניה",
+    "id": "drone-cinematic",
+    "title": "צילומי רחפן סינמטיים",
+    "tag": "צילום אווירי",
+    "category": "aerial",
+    "youtubeId": "ZS07lZFwtqk",
+    "thumb": "/media/works/drone-cinematic/thumb.webp",
+    "preview": "/media/works/drone-cinematic/preview.mp4",
+    "published": true
+  },
+  {
+    "id": "poland-journey",
+    "title": "מסע לפולין",
+    "tag": "סרט מסכם · תיעוד מסע",
     "category": "events",
-    "youtubeId": "",
-    "thumb": "/media/works/bat-mitzvah-noa/thumb.webp",
-    "preview": "/media/works/bat-mitzvah-noa/preview.mp4",
+    "youtubeId": "Zx6IR0Up-A0",
+    "thumb": "/media/works/poland-journey/thumb.webp",
+    "preview": "/media/works/poland-journey/preview.mp4",
     "published": true
   },
   {
-    "id": "family-shoot-levi",
-    "title": "אירוע משפחתי · משפחת לוי",
-    "tag": "צילום וידאו · השרון",
+    "id": "robot-reveal-poros-5554",
+    "title": "Robot Reveal · POROS 5554",
+    "tag": "סרטון חשיפה · הפקה",
+    "category": "business",
+    "youtubeId": "tfmJEt6jmHs",
+    "thumb": "/media/works/robot-reveal-poros-5554/thumb.webp",
+    "preview": "/media/works/robot-reveal-poros-5554/preview.mp4",
+    "published": true
+  },
+  {
+    "id": "fll-robotics-competition",
+    "title": "תחרות רובוטיקה FLL",
+    "tag": "צילום אירועים · סרט סיכום",
     "category": "events",
-    "youtubeId": "",
-    "thumb": "/media/works/family-shoot-levi/thumb.webp",
-    "preview": "/media/works/family-shoot-levi/preview.mp4",
+    "youtubeId": "-H7ayDWN7_I",
+    "thumb": "/media/works/fll-robotics-competition/thumb.webp",
+    "preview": "/media/works/fll-robotics-competition/preview.mp4",
     "published": true
   },
   {
-    "id": "launch-event-nova",
-    "title": "אירוע השקה · Nova",
-    "tag": "אירוע עסקי · תל אביב",
-    "category": "business",
-    "youtubeId": "",
-    "thumb": "/media/works/launch-event-nova/thumb.webp",
-    "preview": "/media/works/launch-event-nova/preview.mp4",
-    "published": true
-  },
-  {
-    "id": "brand-film-carmel",
-    "title": "סרטון תדמית · Carmel",
-    "tag": "וידאו לעסק · הרצליה",
-    "category": "business",
-    "youtubeId": "",
-    "thumb": "/media/works/brand-film-carmel/thumb.webp",
-    "preview": "/media/works/brand-film-carmel/preview.mp4",
-    "published": true
-  },
-  {
-    "id": "product-reel-aria",
-    "title": "סרטון מוצר · Aria",
-    "tag": "וידאו לעסק · נתניה",
-    "category": "business",
-    "youtubeId": "",
-    "thumb": "/media/works/product-reel-aria/thumb.webp",
-    "preview": "/media/works/product-reel-aria/preview.mp4",
-    "published": true
-  },
-  {
-    "id": "bar-mitzvah-yonatan",
-    "title": "בר מצווה · יונתן",
-    "tag": "צילום וידאו · ירושלים",
-    "category": "events",
-    "youtubeId": "",
-    "thumb": "/media/works/bar-mitzvah-yonatan/thumb.webp",
-    "preview": "/media/works/bar-mitzvah-yonatan/preview.mp4",
+    "id": "beit-shean-aerial",
+    "title": "בית שאן מהאוויר",
+    "tag": "צילום אווירי",
+    "category": "aerial",
+    "youtubeId": "BIfYAqC7K9A",
+    "thumb": "/media/works/beit-shean-aerial/thumb.webp",
+    "preview": "/media/works/beit-shean-aerial/preview.mp4",
     "published": true
   }
 ]

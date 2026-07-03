@@ -6,7 +6,7 @@ import { getClientIp, checkAdminLimit, recordAdminFail, clearAdminFails } from '
 
 export const MAX_FILE_BYTES = 3 * 1024 * 1024;   // 3MB per file
 export const MAX_TOTAL_BYTES = 15 * 1024 * 1024; // 15MB per publish
-const CATEGORIES = ['events', 'business'];
+const CATEGORIES = ['events', 'business', 'aerial'];
 const PATH_WHITELIST = [/^content\//, /^client\/public\/media\//];
 
 /**
@@ -54,7 +54,7 @@ export function validateWorks(works) {
       }
     }
     if (!CATEGORIES.includes(w.category)) {
-      return `בעבודה "${w.title}" קטגוריה לא תקינה (חייבת להיות אירועים או עסקים).`;
+      return `בעבודה "${w.title}" קטגוריה לא תקינה (אירועים / עסקים / אווירי).`;
     }
     const yt = w.youtubeId ?? '';
     if (typeof yt !== 'string' || (yt !== '' && !/^[A-Za-z0-9_-]{11}$/.test(yt))) {

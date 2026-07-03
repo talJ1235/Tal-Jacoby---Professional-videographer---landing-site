@@ -10,6 +10,7 @@ const FILTERS = [
   { id: 'all', label: 'הכל' },
   { id: 'events', label: 'אירועים' },
   { id: 'business', label: 'עסקים' },
+  { id: 'aerial', label: 'אווירי' },
 ];
 
 export function Works() {

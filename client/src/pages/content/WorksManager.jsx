@@ -11,7 +11,7 @@ import {
   PREVIEW_MAX_BYTES,
 } from './lib';
 
-const CATEGORY_LABELS = { events: 'אירועים', business: 'עסקים' };
+const CATEGORY_LABELS = { events: 'אירועים', business: 'עסקים', aerial: 'אווירי' };
 const FFMPEG_HINT =
   'ffmpeg -ss 00:00:12 -t 4 -i source.mp4 -an -vf "scale=960:-2,fps=25" -c:v libx264 -crf 27 -pix_fmt yuv420p -movflags +faststart preview.mp4';
 
@@ -124,6 +124,7 @@ function WorkRow({ work, stagedFiles, onUpdate, onDelete, onStageFile }) {
               <select value={work.category} onChange={(e) => onUpdate(work.id, { category: e.target.value })}>
                 <option value="events">אירועים</option>
                 <option value="business">עסקים</option>
+                <option value="aerial">אווירי</option>
               </select>
             </label>
             <label className="cw-field">
