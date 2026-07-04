@@ -13,8 +13,7 @@
   background-repeat: no-repeat;
 }
 
-.opening__video,
-.opening__bg-img {
+.opening__video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -22,14 +21,23 @@
   object-fit: cover;
 }
 
+/* Explicit hero layering: background (0) < scrim (1) < text/cue (2) */
+.opening__video,
+.opening__yt { z-index: 0; }
+.opening__scrim { z-index: 1; }
+.opening__text,
+.opening__cue { z-index: 2; }
+
 /* YouTube background — cover-fit so no letterbox bars show, non-interactive */
 .opening__yt {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  background: var(--bg-0);
 }
-.opening__yt iframe {
+/* iframe covers the section (no letterbox), sits UNDER the poster */
+.opening__yt-frame {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -39,13 +47,27 @@
   border: 0;
   pointer-events: none;
 }
+/* Poster shows instantly ON TOP (hides YT's black loading), fades out on play */
+.opening__yt-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  transition: opacity 700ms ease;
+}
+.opening__yt-poster.is-hidden {
+  opacity: 0;
+}
 
 .opening__scrim {
   position: absolute;
   inset: 0;
-  /* center vignette (for the centered name) layered over the bottom scrim */
+  /* Center vignette darkens only behind the text (keeps the video vivid),
+     layered over the bottom scrim. Strong enough for name + subtitle legibility. */
   background:
-    radial-gradient(ellipse at center, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.18) 45%, rgba(10,10,10,0) 72%),
+    radial-gradient(ellipse 62% 52% at center, rgba(10,10,10,0.66) 0%, rgba(10,10,10,0.34) 40%, rgba(10,10,10,0) 72%),
     var(--hero-scrim);
   pointer-events: none;
 }
@@ -68,13 +90,16 @@
   line-height: 1.05;
   color: var(--text-1);
   letter-spacing: -0.01em;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.55);
 }
 
 .opening__sub {
   margin-block-start: 12px;
   font-size: var(--fs-hero-sub);
   font-weight: 400;
-  color: var(--text-2);
+  color: var(--text-1);
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.7);
 }
 
 /* Scroll cue — a thin vertical line that breathes */

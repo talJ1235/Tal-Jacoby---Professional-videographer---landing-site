@@ -64,17 +64,18 @@ export function Works() {
     }
   };
 
-  const cardAnim = (index) =>
-    reduce
-      ? { layout: true }
-      : {
-          layout: true,
-          initial: { opacity: 0, y: 24 },
-          whileInView: { opacity: 1, y: 0 },
-          exit: { opacity: 0, transition: { duration: 0.2 } },
-          viewport: { once: true, margin: '-80px' },
-          transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: index * 0.06 },
-        };
+  // Fast, quiet filter switching: opacity crossfade + quick layout reflow.
+  // No translate/stagger (that read as jank), and reduced-motion switches
+  // instantly. Stable per-work keys keep already-loaded thumbnails cached.
+  const cardAnim = reduce
+    ? undefined
+    : {
+        layout: true,
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+        transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+      };
 
   return (
     <section id="works" className="works" aria-label="עבודות">
@@ -106,7 +107,7 @@ export function Works() {
                 index={index}
                 onOpen={handleOpen}
                 className={index === 0 ? 'workcard--featured' : ''}
-                anim={cardAnim(index)}
+                anim={cardAnim}
               />
             ))}
           </AnimatePresence>

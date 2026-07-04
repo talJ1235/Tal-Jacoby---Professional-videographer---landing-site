@@ -26,6 +26,15 @@ export function Opening() {
   const videoRef = useRef(null);
   const iframeRef = useRef(null);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [posterHidden, setPosterHidden] = useState(false);
+  const [posterIdx, setPosterIdx] = useState(0);
+
+  const posterCandidates = useYoutube
+    ? [
+        `https://i.ytimg.com/vi/${heroYoutubeId}/maxresdefault.jpg`,
+        `https://i.ytimg.com/vi/${heroYoutubeId}/hqdefault.jpg`,
+      ]
+    : [];
 
   const reduce =
     IS_PREVIEW ||
@@ -62,26 +71,79 @@ export function Opening() {
     return () => io.disconnect();
   }, [reduce, useYoutube]);
 
+  // Reveal the video (fade the poster out) only once it's actually PLAYING —
+  // YouTube's iframe onLoad fires at chrome-load (black + spinner), too early.
+  // Listen for the embed's postMessage state event; fall back after 2s.
+  useEffect(() => {
+    if (reduce || !useYoutube) return undefined;
+    const onMsg = (e) => {
+      if (typeof e.data !== 'string' || !/youtube/.test(e.origin)) return;
+      try {
+        const d = JSON.parse(e.data);
+        const state = d?.info?.playerState ?? (d.event === 'onStateChange' ? d.info : undefined);
+        if (state === 1) setPosterHidden(true); // 1 = playing
+      } catch {
+        /* ignore non-JSON messages */
+      }
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [reduce, useYoutube]);
+
+  const onIframeLoad = () => {
+    // register for YT events, and a safety-net reveal in case none arrive
+    iframeRef.current?.contentWindow?.postMessage(
+      '{"event":"listening","id":1,"channel":"widget"}',
+      '*'
+    );
+    setTimeout(() => setPosterHidden(true), 2000);
+
+    // Counter YouTube autoplay's "scroll the playing iframe into view" for a
+    // short window on load — but stop the moment the user scrolls themselves.
+    let userScrolled = false;
+    const markUser = () => { userScrolled = true; };
+    window.addEventListener('wheel', markUser, { passive: true, once: true });
+    window.addEventListener('touchmove', markUser, { passive: true, once: true });
+    window.addEventListener('keydown', markUser, { once: true });
+    let ticks = 0;
+    const iv = setInterval(() => {
+      if (userScrolled || ticks++ > 12) {
+        clearInterval(iv);
+        return;
+      }
+      if (window.scrollY > 0 && window.scrollY < window.innerHeight * 1.5) {
+        window.scrollTo(0, 0);
+      }
+    }, 100);
+  };
+
   let background = null;
-  if (useYoutube && !reduce) {
+  if (useYoutube) {
+    // The poster sits ON TOP and covers YouTube's black loading state; it fades
+    // out to reveal the playing video. Reduced-motion: poster only, no autoplay.
     background = (
       <div className="opening__yt" aria-hidden="true">
-        <iframe
-          ref={iframeRef}
-          src={ytEmbedSrc(heroYoutubeId)}
-          title="רקע וידאו"
-          allow="autoplay; encrypted-media"
-        />
+        {!reduce && (
+          <iframe
+            ref={iframeRef}
+            className="opening__yt-frame"
+            src={ytEmbedSrc(heroYoutubeId)}
+            title="רקע וידאו"
+            allow="autoplay; encrypted-media"
+            tabIndex={-1}
+            aria-hidden="true"
+            onLoad={onIframeLoad}
+          />
+        )}
+        {posterIdx < posterCandidates.length && (
+          <img
+            className={`opening__yt-poster${posterHidden ? ' is-hidden' : ''}`}
+            src={posterCandidates[posterIdx]}
+            alt=""
+            onError={() => setPosterIdx((i) => i + 1)}
+          />
+        )}
       </div>
-    );
-  } else if (useYoutube && reduce) {
-    background = (
-      <img
-        className="opening__bg-img"
-        src={`https://i.ytimg.com/vi/${heroYoutubeId}/maxresdefault.jpg`}
-        alt=""
-        aria-hidden="true"
-      />
     );
   } else if (!videoFailed) {
     background = (

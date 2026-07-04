@@ -1,6 +1,7 @@
 .works {
   background: var(--bg-0);
   padding-block-start: 128px;
+  padding-block-end: 112px; /* air between the last work and the footer */
 }
 
 .works__inner {

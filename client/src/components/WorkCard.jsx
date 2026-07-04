@@ -8,13 +8,13 @@ const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
 function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
   const { id, title, tag, thumb, preview, youtubeId } = work;
 
-  // Thumbnail fallback chain: local WebP → YouTube maxres → hqdefault → gray box.
-  // Lets the live site look real immediately from YouTube, while an uploaded
-  // graded still (thumb.webp) overrides it automatically once present.
+  // Thumbnail chain: local WebP → YouTube hqdefault → gray box.
+  // hqdefault always exists and loads fast; maxresdefault is intentionally NOT
+  // used (slower and often missing → the "black box" while it 404s/loads).
+  // An uploaded graded still (thumb.webp) overrides YouTube automatically.
   const thumbCandidates = [];
   if (thumb) thumbCandidates.push(thumb);
   if (youtubeId) {
-    thumbCandidates.push(`https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg`);
     thumbCandidates.push(`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`);
   }
 
@@ -97,7 +97,10 @@ function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
               className="workcard__thumb"
               src={thumbCandidates[srcIdx]}
               alt={title}
+              width="1280"
+              height="720"
               loading={index < 2 ? 'eager' : 'lazy'}
+              fetchpriority={index < 2 ? 'high' : 'auto'}
               decoding="async"
               onError={() => setSrcIdx((i) => i + 1)}
             />

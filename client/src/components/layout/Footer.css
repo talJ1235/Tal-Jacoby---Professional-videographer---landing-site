@@ -6,7 +6,7 @@
 .footer__inner {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 72px var(--pad-x) 40px;
+  padding: 48px var(--pad-x) 36px;
   text-align: center;
 }
 
@@ -14,7 +14,7 @@
   font-size: var(--fs-hero-sub);
   color: var(--text-1);
   font-weight: 400;
-  margin-block-end: 24px;
+  margin-block-end: 18px;
 }
 
 .footer__contact {
@@ -22,7 +22,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px 28px;
+  gap: 8px 26px;
   font-size: var(--fs-footer);
 }
 
@@ -47,12 +47,14 @@
 
 .footer__divider {
   height: 1px;
+  width: 100%;
+  max-width: 280px;
+  margin: 18px auto 14px;
   background: var(--border);
-  margin-block: 24px;
 }
 
 .footer__copy {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--text-3);
   letter-spacing: 0.02em;
 }
