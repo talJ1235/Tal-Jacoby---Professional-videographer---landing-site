@@ -1,18 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { stopScroll, startScroll } from '../lib/scroll';
+import { loadYouTubeApi } from '../lib/youtubeApi';
 import './PlayerOverlay.css';
 
 const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
-
-// Sound ON (it's a user click); fastest-starting clean params.
-function embedSrc(id) {
-  const origin = typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : '';
-  return (
-    `https://www.youtube-nocookie.com/embed/${id}` +
-    `?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${origin}`
-  );
-}
 
 function posterFor(work) {
   if (work.thumb && work.thumb.startsWith('/media/')) return work.thumb;
@@ -20,10 +12,10 @@ function posterFor(work) {
   return '';
 }
 
-// Opens with a shared-layoutId morph out of the clicked card. The iframe mounts
-// IMMEDIATELY (autoplay) with the work's poster as a cover that fades out the
-// instant playback starts — so it feels like the card became the video, with no
-// enlarged-thumbnail flash. Closes with a self-contained fade + unmount.
+// Opens with a shared-layoutId morph out of the clicked card. Uses the YouTube
+// IFrame Player API (not a bare embed): the poster cover is removed the instant
+// the player fires PLAYING, and the clip is forced to its true start (seekTo 0)
+// — no early thumbnail flash, no late/mid-clip start. Sound on (user click).
 export function PlayerOverlay({ work, onClose }) {
   const reduce =
     typeof window !== 'undefined' &&
@@ -34,14 +26,21 @@ export function PlayerOverlay({ work, onClose }) {
   const [closing, setClosing] = useState(false);
   const closeRef = useRef(null);
   const rootRef = useRef(null);
-  const iframeRef = useRef(null);
+  const videoHostRef = useRef(null);
+  const playerRef = useRef(null);
+  const unmutedRef = useRef(false);
   const closingRef = useRef(false);
   const pushedRef = useRef(false);
 
-  // Fade out (audio stops as the iframe unmounts), then let the parent remove us.
+  // Fade out (stop the audio immediately), then let the parent remove us.
   const close = () => {
     if (closingRef.current) return;
     closingRef.current = true;
+    try {
+      playerRef.current?.stopVideo?.();
+    } catch {
+      /* ignore */
+    }
     setClosing(true);
     setTimeout(onClose, reduce ? 0 : 200);
   };
@@ -102,44 +101,70 @@ export function PlayerOverlay({ work, onClose }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fade the poster out the instant the video actually plays (YT postMessage
-  // state), with a safety-net reveal so the poster never sticks.
+  // Create the YT.Player. Poster is removed ON the PLAYING event; a 4s safety
+  // net reveals it if that never arrives (autoplay blocked / API failure).
   useEffect(() => {
-    if (reduce) return undefined;
-    const onMsg = (e) => {
-      if (typeof e.data !== 'string' || !/youtube/.test(e.origin)) return;
+    if (!work.youtubeId || !videoHostRef.current) return undefined;
+    let cancelled = false;
+    const fallback = setTimeout(() => setPosterHidden(true), 4000);
+
+    loadYouTubeApi().then((YT) => {
+      if (cancelled || !YT || !videoHostRef.current) return;
+      const host = document.createElement('div');
+      videoHostRef.current.appendChild(host);
+      playerRef.current = new YT.Player(host, {
+        videoId: work.youtubeId,
+        playerVars: {
+          autoplay: 1,
+          mute: 1, // muted autoplay always starts; we unmute on PLAYING for sound
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          start: 0,
+          controls: 1,
+          iv_load_policy: 3,
+          origin: window.location.origin,
+        },
+        events: {
+          onReady: (e) => {
+            try {
+              e.target.seekTo(0, true); // guarantee the true beginning
+              e.target.playVideo();
+            } catch {
+              /* ignore */
+            }
+          },
+          onStateChange: (e) => {
+            if (e.data === 1) {
+              // sound on (the card click is the user gesture that allows unmute)
+              if (!unmutedRef.current) {
+                unmutedRef.current = true;
+                try { e.target.unMute(); } catch { /* ignore */ }
+              }
+              setPosterHidden(true); // 1 = PLAYING → remove poster on the event
+            }
+          },
+        },
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(fallback);
       try {
-        const d = JSON.parse(e.data);
-        const state = d?.info?.playerState ?? (d.event === 'onStateChange' ? d.info : undefined);
-        if (state === 1) setPosterHidden(true);
+        playerRef.current?.destroy?.();
       } catch {
         /* ignore */
       }
+      playerRef.current = null;
     };
-    window.addEventListener('message', onMsg);
-    return () => window.removeEventListener('message', onMsg);
-  }, [reduce]);
-
-  const onIframeLoad = () => {
-    iframeRef.current?.contentWindow?.postMessage(
-      '{"event":"listening","id":1,"channel":"widget"}',
-      '*'
-    );
-    setTimeout(() => setPosterHidden(true), 1500);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const stageInner = (
     <>
       {work.youtubeId ? (
-        <iframe
-          ref={iframeRef}
-          className="player__iframe"
-          src={embedSrc(work.youtubeId)}
-          title={work.title}
-          allow="autoplay; encrypted-media; fullscreen"
-          allowFullScreen
-          onLoad={onIframeLoad}
-        />
+        <div className="player__video" ref={videoHostRef} />
       ) : (
         <div className="player__placeholder">
           <span>הסרטון יתווסף בקרוב</span>

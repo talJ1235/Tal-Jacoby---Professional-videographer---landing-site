@@ -1,23 +1,29 @@
 import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { IS_PREVIEW } from '../content/previewMode';
+import { loadYouTubeApi } from '../lib/youtubeApi';
 import './WorkCard.css';
 
 const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
 
-// Warm the connection to YouTube once (on hover / card visibility) so the
-// fullscreen player's iframe starts almost instantly when a card is clicked.
+// Warm YouTube once (on hover / card visibility): preconnect the player hosts
+// AND pre-load the IFrame Player API so the first card click starts fast.
 let ytWarmed = false;
 function warmYouTube() {
   if (ytWarmed || typeof document === 'undefined') return;
   ytWarmed = true;
-  for (const href of ['https://www.youtube-nocookie.com', 'https://i.ytimg.com']) {
+  for (const href of [
+    'https://www.youtube.com',
+    'https://s.ytimg.com',
+    'https://i.ytimg.com',
+  ]) {
     const link = document.createElement('link');
     link.rel = 'preconnect';
     link.href = href;
     link.crossOrigin = '';
     document.head.appendChild(link);
   }
+  loadYouTubeApi(); // have the API ready before the click
 }
 
 function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {

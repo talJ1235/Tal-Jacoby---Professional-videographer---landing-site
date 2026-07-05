@@ -33,7 +33,11 @@
   }
 }
 
-.player__iframe {
+.player__video {
+  position: absolute;
+  inset: 0;
+}
+.player__video iframe {
   position: absolute;
   inset: 0;
   width: 100%;
