@@ -6,15 +6,15 @@
 .footer__inner {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 48px var(--pad-x) 36px;
+  padding: 40px var(--pad-x) 26px;
   text-align: center;
 }
 
 .footer__heading {
-  font-size: var(--fs-hero-sub);
+  font-size: 1.0625rem;
   color: var(--text-1);
   font-weight: 400;
-  margin-block-end: 18px;
+  margin-block-end: 14px;
 }
 
 .footer__contact {
@@ -48,13 +48,14 @@
 .footer__divider {
   height: 1px;
   width: 100%;
-  max-width: 280px;
-  margin: 18px auto 14px;
+  max-width: 260px;
+  margin: 14px auto 12px;
   background: var(--border);
 }
 
 .footer__copy {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--text-3);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
+  margin-block-start: 4px;
 }

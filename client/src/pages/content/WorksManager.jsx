@@ -192,8 +192,10 @@ export function WorksManager({ works, stagedFiles, onReorder, onUpdate, onAdd, o
       tag: '',
       category: 'events',
       youtubeId: '',
-      thumb: mediaUrl(id, 'thumb.webp'),
-      preview: mediaUrl(id, 'preview.mp4'),
+      // thumb/preview stay empty until an actual file is uploaded, so WorkCard
+      // knows to use the YouTube thumbnail rather than requesting a missing file.
+      thumb: '',
+      preview: '',
       published: true,
     });
   };

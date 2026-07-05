@@ -6,7 +6,7 @@
     "category": "aerial",
     "youtubeId": "ZS07lZFwtqk",
     "thumb": "/media/works/drone-cinematic/thumb.webp",
-    "preview": "/media/works/drone-cinematic/preview.mp4",
+    "preview": "",
     "published": true
   },
   {
@@ -16,7 +16,7 @@
     "category": "events",
     "youtubeId": "Zx6IR0Up-A0",
     "thumb": "/media/works/poland-journey/thumb.webp",
-    "preview": "/media/works/poland-journey/preview.mp4",
+    "preview": "",
     "published": true
   },
   {
@@ -26,7 +26,7 @@
     "category": "business",
     "youtubeId": "tfmJEt6jmHs",
     "thumb": "/media/works/robot-reveal-poros-5554/thumb.webp",
-    "preview": "/media/works/robot-reveal-poros-5554/preview.mp4",
+    "preview": "",
     "published": true
   },
   {
@@ -36,7 +36,7 @@
     "category": "events",
     "youtubeId": "-H7ayDWN7_I",
     "thumb": "/media/works/fll-robotics-competition/thumb.webp",
-    "preview": "/media/works/fll-robotics-competition/preview.mp4",
+    "preview": "",
     "published": true
   },
   {
@@ -46,7 +46,7 @@
     "category": "aerial",
     "youtubeId": "BIfYAqC7K9A",
     "thumb": "/media/works/beit-shean-aerial/thumb.webp",
-    "preview": "/media/works/beit-shean-aerial/preview.mp4",
+    "preview": "",
     "published": true
   },
   {
@@ -55,8 +55,8 @@
     "tag": "פרויקט הנדסי · תיעוד ופיתוח",
     "category": "business",
     "youtubeId": "l2cBFh73ftc",
-    "thumb": "/media/works/work-6/thumb.webp",
-    "preview": "/media/works/work-6/preview.mp4",
+    "thumb": "",
+    "preview": "",
     "published": true
   },
   {
@@ -65,8 +65,8 @@
     "tag": "פרויקט הנדסי · תיעוד ופיתוח",
     "category": "business",
     "youtubeId": "IjAfqCEwon0",
-    "thumb": "/media/works/work-7/thumb.webp",
-    "preview": "/media/works/work-7/preview.mp4",
+    "thumb": "",
+    "preview": "",
     "published": true
   },
   {
@@ -75,8 +75,8 @@
     "tag": "צילום אירועים · בת מצווה",
     "category": "events",
     "youtubeId": "0OL1JovRuvY",
-    "thumb": "/media/works/work-8/thumb.webp",
-    "preview": "/media/works/work-8/preview.mp4",
+    "thumb": "",
+    "preview": "",
     "published": true
   }
 ]

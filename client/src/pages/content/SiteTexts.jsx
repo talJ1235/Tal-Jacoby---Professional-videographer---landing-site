@@ -39,6 +39,14 @@ export function SiteTexts({ site, onChange }) {
           />
         </label>
         <label className="cw-field">
+          <span>וידאו רקע עצמאי (נתיב MP4 — גובר על יוטיוב)</span>
+          <input
+            value={site.heroVideo || ''}
+            placeholder="/media/showreel/showreel.mp4"
+            onChange={(e) => onChange({ heroVideo: e.target.value.trim() })}
+          />
+        </label>
+        <label className="cw-field">
           <span>כותרת SEO (טאב הדפדפן)</span>
           <input value={site.seoTitle} onChange={(e) => onChange({ seoTitle: e.target.value })} />
         </label>

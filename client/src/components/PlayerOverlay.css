@@ -33,20 +33,29 @@
   }
 }
 
-.player__poster {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--bg-1);
-}
-
 .player__iframe {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+/* Poster sits ABOVE the iframe (covers YouTube's black loading) and fades out
+   the instant playback starts, so it feels like the card became the video. */
+.player__poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bg-1);
+  opacity: 1;
+  transition: opacity 350ms ease;
+}
+.player__poster.is-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .player__placeholder {

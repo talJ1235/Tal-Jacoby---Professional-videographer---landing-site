@@ -5,29 +5,48 @@ import './WorkCard.css';
 
 const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
 
+// Warm the connection to YouTube once (on hover / card visibility) so the
+// fullscreen player's iframe starts almost instantly when a card is clicked.
+let ytWarmed = false;
+function warmYouTube() {
+  if (ytWarmed || typeof document === 'undefined') return;
+  ytWarmed = true;
+  for (const href of ['https://www.youtube-nocookie.com', 'https://i.ytimg.com']) {
+    const link = document.createElement('link');
+    link.rel = 'preconnect';
+    link.href = href;
+    link.crossOrigin = '';
+    document.head.appendChild(link);
+  }
+}
+
 function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
   const { id, title, tag, thumb, preview, youtubeId } = work;
 
-  // Thumbnail chain: local WebP → YouTube hqdefault → gray box.
-  // hqdefault always exists and loads fast; maxresdefault is intentionally NOT
-  // used (slower and often missing → the "black box" while it 404s/loads).
-  // An uploaded graded still (thumb.webp) overrides YouTube automatically.
-  const thumbCandidates = [];
-  if (thumb) thumbCandidates.push(thumb);
-  if (youtubeId) {
-    thumbCandidates.push(`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`);
-  }
+  // Thumbnail precedence: uploaded local thumb.webp (work.thumb points at a
+  // /media path only when a still was actually uploaded) → YouTube hqdefault →
+  // gray box. hqdefault always exists and loads fast; maxres is avoided (slow/
+  // often missing = the "black box"). onError degrades local→YouTube gracefully.
+  const localThumb = thumb && thumb.startsWith('/media/') ? thumb : '';
+  const ytHq = youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : '';
 
   const videoRef = useRef(null);
   const srcSetRef = useRef(false);
   const [active, setActive] = useState(false);   // preview showing / scaled
-  const [srcIdx, setSrcIdx] = useState(0);
-  const thumbFailed = srcIdx >= thumbCandidates.length;
+  const [imgSrc, setImgSrc] = useState(localThumb || ytHq);
+  const [thumbFailed, setThumbFailed] = useState(!localThumb && !ytHq);
+
+  const handleImgError = () => {
+    if (imgSrc === localThumb && ytHq) setImgSrc(ytHq); // uploaded missing → YouTube
+    else setThumbFailed(true);                          // nothing loads → gray box
+  };
 
   const reduce =
     IS_PREVIEW ||
     (typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const hasPreview = preview && preview.startsWith('/media/');
 
   // Assign the preview src only once, the first time it's needed.
   const ensureSrc = () => {
@@ -38,7 +57,7 @@ function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
   };
 
   const startPreview = () => {
-    if (reduce) return;
+    if (reduce || !hasPreview) return;
     ensureSrc();
     const video = videoRef.current;
     if (video) video.play().catch(() => {});
@@ -62,8 +81,12 @@ function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.intersectionRatio >= 0.6) startPreview();
-        else stopPreview();
+        if (entry.intersectionRatio >= 0.6) {
+          warmYouTube();
+          startPreview();
+        } else {
+          stopPreview();
+        }
       },
       { threshold: [0, 0.6] }
     );
@@ -73,6 +96,7 @@ function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
   }, [reduce]);
 
   const fineHover = () => {
+    warmYouTube();
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) startPreview();
   };
   const fineLeave = () => {
@@ -95,14 +119,14 @@ function WorkCardBase({ work, index, onOpen, className = '', anim }, ref) {
           {!thumbFailed && (
             <img
               className="workcard__thumb"
-              src={thumbCandidates[srcIdx]}
+              src={imgSrc}
               alt={title}
-              width="1280"
-              height="720"
+              width="1600"
+              height="900"
               loading={index < 2 ? 'eager' : 'lazy'}
               fetchpriority={index < 2 ? 'high' : 'auto'}
               decoding="async"
-              onError={() => setSrcIdx((i) => i + 1)}
+              onError={handleImgError}
             />
           )}
           <video

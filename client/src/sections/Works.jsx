@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useContent } from '../content/useContent';
 import { IS_PREVIEW } from '../content/previewMode';
 import { WorkCard } from '../components/WorkCard';
@@ -64,19 +64,6 @@ export function Works() {
     }
   };
 
-  // Fast, quiet filter switching: opacity crossfade + quick layout reflow.
-  // No translate/stagger (that read as jank), and reduced-motion switches
-  // instantly. Stable per-work keys keep already-loaded thumbnails cached.
-  const cardAnim = reduce
-    ? undefined
-    : {
-        layout: true,
-        initial: { opacity: 0 },
-        animate: { opacity: 1 },
-        exit: { opacity: 0 },
-        transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-      };
-
   return (
     <section id="works" className="works" aria-label="עבודות">
       <div className="works__inner">
@@ -98,8 +85,18 @@ export function Works() {
           </div>
         </header>
 
-        <div className="works__grid">
-          <AnimatePresence mode="popLayout">
+        {/* One consistent transition for every filter change: the whole grid
+            cross-dissolves (keyed by filter). No per-card layout/slide, so all
+            directions behave identically; images are cached (stable ids). */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={filter}
+            className="works__grid"
+            initial={{ opacity: reduce ? 1 : 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
             {filtered.map((work, index) => (
               <WorkCard
                 key={work.id}
@@ -107,11 +104,10 @@ export function Works() {
                 index={index}
                 onOpen={handleOpen}
                 className={index === 0 ? 'workcard--featured' : ''}
-                anim={cardAnim}
               />
             ))}
-          </AnimatePresence>
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {expanded && (

@@ -5,22 +5,36 @@ import './PlayerOverlay.css';
 
 const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
 
+// Sound ON (it's a user click); fastest-starting clean params.
 function embedSrc(id) {
-  return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+  const origin = typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : '';
+  return (
+    `https://www.youtube-nocookie.com/embed/${id}` +
+    `?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${origin}`
+  );
 }
 
-// Opens with a shared-layoutId morph out of the clicked card, then fades the
-// YouTube iframe in. Closes with a self-contained fade + unmount (no reliance on
-// AnimatePresence exit, which hangs when mixed with the shared-layout morph).
+function posterFor(work) {
+  if (work.thumb && work.thumb.startsWith('/media/')) return work.thumb;
+  if (work.youtubeId) return `https://i.ytimg.com/vi/${work.youtubeId}/hqdefault.jpg`;
+  return '';
+}
+
+// Opens with a shared-layoutId morph out of the clicked card. The iframe mounts
+// IMMEDIATELY (autoplay) with the work's poster as a cover that fades out the
+// instant playback starts — so it feels like the card became the video, with no
+// enlarged-thumbnail flash. Closes with a self-contained fade + unmount.
 export function PlayerOverlay({ work, onClose }) {
   const reduce =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const [iframeReady, setIframeReady] = useState(reduce);
+  const posterUrl = posterFor(work);
+  const [posterHidden, setPosterHidden] = useState(false);
   const [closing, setClosing] = useState(false);
   const closeRef = useRef(null);
   const rootRef = useRef(null);
+  const iframeRef = useRef(null);
   const closingRef = useRef(false);
   const pushedRef = useRef(false);
 
@@ -28,7 +42,6 @@ export function PlayerOverlay({ work, onClose }) {
   const close = () => {
     if (closingRef.current) return;
     closingRef.current = true;
-    setIframeReady(false);
     setClosing(true);
     setTimeout(onClose, reduce ? 0 : 200);
   };
@@ -89,30 +102,55 @@ export function PlayerOverlay({ work, onClose }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fade the poster out the instant the video actually plays (YT postMessage
+  // state), with a safety-net reveal so the poster never sticks.
+  useEffect(() => {
+    if (reduce) return undefined;
+    const onMsg = (e) => {
+      if (typeof e.data !== 'string' || !/youtube/.test(e.origin)) return;
+      try {
+        const d = JSON.parse(e.data);
+        const state = d?.info?.playerState ?? (d.event === 'onStateChange' ? d.info : undefined);
+        if (state === 1) setPosterHidden(true);
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [reduce]);
+
+  const onIframeLoad = () => {
+    iframeRef.current?.contentWindow?.postMessage(
+      '{"event":"listening","id":1,"channel":"widget"}',
+      '*'
+    );
+    setTimeout(() => setPosterHidden(true), 1500);
+  };
+
   const stageInner = (
     <>
-      <div
-        className="player__poster"
-        style={{ backgroundImage: `url(${work.thumb})` }}
-        aria-hidden="true"
-      />
       {work.youtubeId ? (
-        iframeReady && (
-          <motion.iframe
-            className="player__iframe"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.25 }}
-            src={embedSrc(work.youtubeId)}
-            title={work.title}
-            allow="autoplay; encrypted-media; fullscreen"
-            allowFullScreen
-          />
-        )
+        <iframe
+          ref={iframeRef}
+          className="player__iframe"
+          src={embedSrc(work.youtubeId)}
+          title={work.title}
+          allow="autoplay; encrypted-media; fullscreen"
+          allowFullScreen
+          onLoad={onIframeLoad}
+        />
       ) : (
         <div className="player__placeholder">
           <span>הסרטון יתווסף בקרוב</span>
         </div>
+      )}
+      {posterUrl && work.youtubeId && (
+        <div
+          className={`player__poster${posterHidden ? ' is-hidden' : ''}`}
+          style={{ backgroundImage: `url(${posterUrl})` }}
+          aria-hidden="true"
+        />
       )}
     </>
   );
@@ -150,7 +188,6 @@ export function PlayerOverlay({ work, onClose }) {
             layoutId={closing ? undefined : `work-${work.id}`}
             animate={{ opacity: closing ? 0 : 1 }}
             transition={closing ? { duration: 0.2 } : MORPH}
-            onLayoutAnimationComplete={() => setIframeReady(true)}
             onClick={(e) => e.stopPropagation()}
           >
             {stageInner}

@@ -21,12 +21,13 @@
   object-fit: cover;
 }
 
-/* Explicit hero layering: background (0) < scrim (1) < text/cue (2) */
+/* Explicit hero layering: background (0) < fade (1) < scrim (2) < text/cue (3) */
 .opening__video,
 .opening__yt { z-index: 0; }
-.opening__scrim { z-index: 1; }
+.opening__fade { z-index: 1; }
+.opening__scrim { z-index: 2; }
 .opening__text,
-.opening__cue { z-index: 2; }
+.opening__cue { z-index: 3; }
 
 /* YouTube background — cover-fit so no letterbox bars show, non-interactive */
 .opening__yt {
@@ -36,15 +37,34 @@
   pointer-events: none;
   background: var(--bg-0);
 }
-/* iframe covers the section (no letterbox), sits UNDER the poster */
+/* iframe scaled ~1.45× beyond cover so YouTube's title bar (top) and any
+   bottom overlays are pushed OUTSIDE the visible hero — only clean footage shows */
 .opening__yt-frame {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: max(100vw, 177.78svh);   /* 16/9 of the height */
-  height: max(100svh, 56.25vw);   /* 9/16 of the width  */
+  width: calc(max(100vw, 177.78svh) * 1.45);
+  height: calc(max(100svh, 56.25vw) * 1.45);
   border: 0;
+  pointer-events: none;
+}
+/* transparent layer above the iframe to intercept any hover-triggered YT UI */
+.opening__yt-guard {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/* Bottom fade — the footage dissolves into --bg-0 over the lower ~20% */
+.opening__fade {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 22%;
+  background: linear-gradient(to bottom, rgba(10, 10, 10, 0) 0%, var(--bg-0) 100%);
   pointer-events: none;
 }
 /* Poster shows instantly ON TOP (hides YT's black loading), fades out on play */
@@ -67,7 +87,7 @@
   /* Center vignette darkens only behind the text (keeps the video vivid),
      layered over the bottom scrim. Strong enough for name + subtitle legibility. */
   background:
-    radial-gradient(ellipse 62% 52% at center, rgba(10,10,10,0.66) 0%, rgba(10,10,10,0.34) 40%, rgba(10,10,10,0) 72%),
+    radial-gradient(ellipse 70% 58% at center, rgba(10,10,10,0.68) 0%, rgba(10,10,10,0.36) 42%, rgba(10,10,10,0) 74%),
     var(--hero-scrim);
   pointer-events: none;
 }

@@ -7,20 +7,27 @@ import './Opening.css';
 const SHOWREEL = '/media/showreel/showreel.mp4';
 const POSTER = '/media/showreel/poster.jpg';
 
-// Muted, looping, controls-free YouTube background embed.
+// Muted, looping, controls-free YouTube background embed — cleanest params to
+// minimize on-screen YouTube UI (title/branding/annotations/suggestions).
 function ytEmbedSrc(id) {
   const origin = typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : '';
   return (
     `https://www.youtube-nocookie.com/embed/${id}` +
     `?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&playsinline=1` +
-    `&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin=${origin}`
+    `&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1&origin=${origin}`
   );
 }
 
 export function Opening() {
   const { site } = useContent();
+  // Dual-path hero: a self-hosted file (site.heroVideo) wins → <video>; else a
+  // YouTube background (site.heroYoutubeId); else the default showreel.mp4.
+  // Dropping in a real MP4 later = set site.heroVideo (+ optional heroPoster).
+  const heroVideo = site.heroVideo || '';
   const heroYoutubeId = site.heroYoutubeId || '';
-  const useYoutube = !!heroYoutubeId;
+  const useYoutube = !heroVideo && !!heroYoutubeId;
+  const videoSrc = heroVideo || SHOWREEL;
+  const videoPoster = site.heroPoster || POSTER;
 
   const sectionRef = useRef(null);
   const videoRef = useRef(null);
@@ -135,6 +142,8 @@ export function Opening() {
             onLoad={onIframeLoad}
           />
         )}
+        {/* transparent guard above the iframe so hover never triggers YT UI */}
+        <div className="opening__yt-guard" aria-hidden="true" />
         {posterIdx < posterCandidates.length && (
           <img
             className={`opening__yt-poster${posterHidden ? ' is-hidden' : ''}`}
@@ -150,8 +159,8 @@ export function Opening() {
       <video
         ref={videoRef}
         className="opening__video"
-        src={SHOWREEL}
-        poster={POSTER}
+        src={videoSrc}
+        poster={videoPoster}
         autoPlay={!reduce}
         muted
         loop
@@ -170,10 +179,12 @@ export function Opening() {
       id="opening"
       className={`opening${showreelFallback ? ' opening--fallback' : ''}`}
       aria-label="פתיח"
-      style={showreelFallback ? { backgroundImage: `url(${POSTER})` } : undefined}
+      style={showreelFallback ? { backgroundImage: `url(${videoPoster})` } : undefined}
     >
       {background}
 
+      {/* cinematic fade so the footage dissolves into the page background */}
+      <div className="opening__fade" aria-hidden="true" />
       <div className="opening__scrim" aria-hidden="true" />
 
       <motion.div
