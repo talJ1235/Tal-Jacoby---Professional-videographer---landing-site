@@ -15,8 +15,11 @@ dist/
 *.db
 *.db-journal
 
-# Claude Code workspace
-.claude/
+# Claude Code workspace — skills + launch config are COMMITTED so they travel
+# with the repo (multi-account handoff). Only the per-machine local settings and
+# ad-hoc scratch are ignored.
+.claude/settings.local.json
+.claude/*.local.json
 
 # OS
 .DS_Store

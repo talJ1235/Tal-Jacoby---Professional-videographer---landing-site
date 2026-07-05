@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useContent } from '../content/useContent';
 import { IS_PREVIEW } from '../content/previewMode';
+import { scrollToSection } from '../lib/scroll';
 import './Opening.css';
 
 const SHOWREEL = '/media/showreel/showreel.mp4';
@@ -48,9 +49,13 @@ export function Opening() {
     (typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  // Pause the background when the hero leaves the viewport (battery).
+  // Pause the background when the hero leaves the viewport (battery). The
+  // self-hosted <video> runs even under reduced-motion (a muted background clip
+  // is not vestibular motion, and gating it off froze the hero on its poster);
+  // the YouTube path stays disabled under reduced-motion (its iframe isn't
+  // mounted then).
   useEffect(() => {
-    if (reduce) return;
+    if (useYoutube && reduce) return;
     const section = sectionRef.current;
     if (!section) return;
 
@@ -77,6 +82,47 @@ export function Opening() {
     io.observe(section);
     return () => io.disconnect();
   }, [reduce, useYoutube]);
+
+  // Self-hosted <video>: React does not reliably apply the `muted` attribute to
+  // the DOM node (facebook/react#10389). Without a truly-muted element the
+  // browser's autoplay policy blocks playback, play() rejects, and the hero
+  // freezes on its poster. Force muted imperatively, then play(); if a policy
+  // still blocks it, retry on the first user interaction so it never stays
+  // frozen. (Reduced-motion keeps the still poster, by design.)
+  useEffect(() => {
+    if (useYoutube) return undefined;
+    const v = videoRef.current;
+    if (!v) return undefined;
+
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('muted', '');
+    v.playsInline = true;
+
+    let cleanupRetry = () => {};
+    const attemptPlay = () => {
+      const p = v.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => {
+          const retry = () => {
+            v.muted = true;
+            v.play().catch(() => {});
+            cleanupRetry();
+          };
+          window.addEventListener('pointerdown', retry, { once: true });
+          window.addEventListener('touchstart', retry, { once: true, passive: true });
+          window.addEventListener('keydown', retry, { once: true });
+          cleanupRetry = () => {
+            window.removeEventListener('pointerdown', retry);
+            window.removeEventListener('touchstart', retry);
+            window.removeEventListener('keydown', retry);
+          };
+        });
+      }
+    };
+    attemptPlay();
+    return () => cleanupRetry();
+  }, [useYoutube, reduce, videoSrc]);
 
   // Reveal the video (fade the poster out) only once it's actually PLAYING —
   // YouTube's iframe onLoad fires at chrome-load (black + spinner), too early.
@@ -161,7 +207,7 @@ export function Opening() {
         className="opening__video"
         src={videoSrc}
         poster={videoPoster}
-        autoPlay={!reduce}
+        autoPlay
         muted
         loop
         playsInline
@@ -195,9 +241,14 @@ export function Opening() {
       >
         <h1 className="opening__name">{site.heroName}</h1>
         <p className="opening__sub">{site.heroSubtitle}</p>
+        <button
+          type="button"
+          className="opening__cta"
+          onClick={() => scrollToSection('works')}
+        >
+          צפו בעבודות
+        </button>
       </motion.div>
-
-      {!reduce && <div className="opening__cue" aria-hidden="true" />}
     </section>
   );
 }

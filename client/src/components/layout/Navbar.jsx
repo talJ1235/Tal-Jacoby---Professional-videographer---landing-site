@@ -16,11 +16,18 @@ export function Navbar() {
     <nav className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}>
       <button
         type="button"
-        className="navbar__name"
+        className="navbar__logo"
         onClick={scrollToTop}
         aria-label="טל יעקבי — לראש הדף"
       >
-        טל יעקבי
+        <img
+          className="navbar__logo-img"
+          src="/media/brand/logo.png"
+          alt="טל יעקבי"
+          width="28"
+          height="34"
+          decoding="async"
+        />
       </button>
       <button
         type="button"

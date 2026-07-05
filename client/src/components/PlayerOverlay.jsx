@@ -4,24 +4,39 @@ import { stopScroll, startScroll } from '../lib/scroll';
 import { loadYouTubeApi } from '../lib/youtubeApi';
 import './PlayerOverlay.css';
 
-const MORPH = { duration: 0.45, ease: [0.22, 1, 0.36, 1] };
+// Slow, cinematic card→fullscreen grow (~0.9s). The card expands into a dark
+// player frame — no thumbnail is ever shown enlarged; the growing frame + its
+// subtle "powering-on" shimmer IS the loading screen, so YouTube's cold-start
+// happens entirely inside the animation and the reveal feels like the frame
+// resolving into the video.
+const MORPH = { duration: 0.9, ease: [0.22, 1, 0.36, 1] };
 
-function posterFor(work) {
-  if (work.thumb && work.thumb.startsWith('/media/')) return work.thumb;
-  if (work.youtubeId) return `https://i.ytimg.com/vi/${work.youtubeId}/hqdefault.jpg`;
-  return '';
-}
+// Timestamped player instrumentation. Enable on any device by opening the page
+// with ?ytdebug=1 (or localStorage.ytDebug = '1'), then read the console.
+const DEBUG =
+  typeof window !== 'undefined' &&
+  (/[?&]ytdebug=1/.test(window.location.search) ||
+    (() => {
+      try {
+        return window.localStorage.getItem('ytDebug') === '1';
+      } catch {
+        return false;
+      }
+    })());
+
+const YT_STATE = { '-1': 'unstarted', 0: 'ended', 1: 'PLAYING', 2: 'paused', 3: 'buffering', 5: 'cued' };
 
 // Opens with a shared-layoutId morph out of the clicked card. Uses the YouTube
-// IFrame Player API (not a bare embed): the poster cover is removed the instant
-// the player fires PLAYING, and the clip is forced to its true start (seekTo 0)
-// — no early thumbnail flash, no late/mid-clip start. Sound on (user click).
+// IFrame Player API (not a bare embed). The poster cover is removed on the
+// EARLIEST real-playback signal — the PLAYING state event OR getCurrentTime
+// first advancing past 0 (whichever fires first) — never a blind timer, so the
+// reveal lands on the true first painted frame and never mid-clip. seekTo(0)
+// forces the true start. Sound on (the card click is the unmute gesture).
 export function PlayerOverlay({ work, onClose }) {
   const reduce =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const posterUrl = posterFor(work);
   const [posterHidden, setPosterHidden] = useState(false);
   const [closing, setClosing] = useState(false);
   const closeRef = useRef(null);
@@ -101,15 +116,38 @@ export function PlayerOverlay({ work, onClose }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Create the YT.Player. Poster is removed ON the PLAYING event; a 4s safety
-  // net reveals it if that never arrives (autoplay blocked / API failure).
+  // Create the YT.Player. The poster is removed on the earliest real-playback
+  // signal: a short getCurrentTime poll (fires the instant the clip advances
+  // past 0 = first painted frame) races the PLAYING state event. A long 10s
+  // net only covers a genuine playback failure — it is NOT the normal path, so
+  // a missed event can no longer reveal a mid-clip frame.
   useEffect(() => {
     if (!work.youtubeId || !videoHostRef.current) return undefined;
     let cancelled = false;
-    const fallback = setTimeout(() => setPosterHidden(true), 4000);
+    let poll = null;
+    const t0 = performance.now();
+    const ms = () => `${Math.round(performance.now() - t0)}ms`;
+    const log = (...a) => DEBUG && console.log('[player]', ms(), ...a);
+
+    log('open', work.id, 'youtubeId', work.youtubeId);
+
+    let revealed = false;
+    const reveal = (why) => {
+      if (cancelled || revealed) return;
+      revealed = true;
+      if (poll) { clearInterval(poll); poll = null; }
+      clearTimeout(failNet);
+      log('POSTER REMOVED (open→first-frame)', 'via', why);
+      setPosterHidden(true);
+    };
+
+    // True-failure net only (autoplay blocked / API never loads). Long enough
+    // that it never fires on a normal successful start.
+    const failNet = setTimeout(() => reveal('10s-failsafe'), 10000);
 
     loadYouTubeApi().then((YT) => {
       if (cancelled || !YT || !videoHostRef.current) return;
+      log('YT API ready → creating player');
       const host = document.createElement('div');
       videoHostRef.current.appendChild(host);
       playerRef.current = new YT.Player(host, {
@@ -127,21 +165,33 @@ export function PlayerOverlay({ work, onClose }) {
         },
         events: {
           onReady: (e) => {
+            log('onReady');
             try {
               e.target.seekTo(0, true); // guarantee the true beginning
               e.target.playVideo();
             } catch {
               /* ignore */
             }
+            // Poll for the first advancing frame — the earliest reliable paint
+            // signal, usually ahead of (or at) the PLAYING event.
+            if (poll) clearInterval(poll);
+            poll = setInterval(() => {
+              let ct = 0;
+              try { ct = e.target.getCurrentTime() || 0; } catch { /* ignore */ }
+              if (ct > 0.04) {
+                if (ct > 1.2) { try { e.target.seekTo(0, true); } catch { /* ignore */ } }
+                reveal(`currentTime=${ct.toFixed(2)}s`);
+              }
+            }, 40);
           },
           onStateChange: (e) => {
+            log('state', e.data, YT_STATE[e.data] || '?');
             if (e.data === 1) {
-              // sound on (the card click is the user gesture that allows unmute)
               if (!unmutedRef.current) {
                 unmutedRef.current = true;
                 try { e.target.unMute(); } catch { /* ignore */ }
               }
-              setPosterHidden(true); // 1 = PLAYING → remove poster on the event
+              reveal('PLAYING-event'); // 1 = PLAYING → first frame is painting
             }
           },
         },
@@ -150,7 +200,8 @@ export function PlayerOverlay({ work, onClose }) {
 
     return () => {
       cancelled = true;
-      clearTimeout(fallback);
+      clearTimeout(failNet);
+      if (poll) clearInterval(poll);
       try {
         playerRef.current?.destroy?.();
       } catch {
@@ -170,12 +221,17 @@ export function PlayerOverlay({ work, onClose }) {
           <span>הסרטון יתווסף בקרוב</span>
         </div>
       )}
-      {posterUrl && work.youtubeId && (
+      {/* Loading surface — a NEUTRAL dark plate (no thumbnail, no image of any
+          kind) with a subtle "powering-on" shimmer. It hides YouTube's black
+          cold-start and fades out the instant the first video frame paints, so
+          the open is one continuous motion: card → dark frame → video. */}
+      {work.youtubeId && (
         <div
-          className={`player__poster${posterHidden ? ' is-hidden' : ''}`}
-          style={{ backgroundImage: `url(${posterUrl})` }}
+          className={`player__cover${posterHidden ? ' is-hidden' : ''}`}
           aria-hidden="true"
-        />
+        >
+          <span className="player__shimmer" />
+        </div>
       )}
     </>
   );

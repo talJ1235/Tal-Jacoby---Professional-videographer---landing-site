@@ -45,21 +45,47 @@
   border: 0;
 }
 
-/* Poster sits ABOVE the iframe (covers YouTube's black loading) and fades out
-   the instant playback starts, so it feels like the card became the video. */
-.player__poster {
+/* Loading surface sits ABOVE the iframe and masks YouTube's cold-start. It is a
+   NEUTRAL dark plate — no thumbnail, no image of any kind — so nothing of the
+   video is ever shown enlarged before it truly plays. Fades out the instant the
+   first frame paints, so the open reads as one continuous motion:
+   card → dark frame (powering on) → video. */
+.player__cover {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--bg-1);
+  overflow: hidden;
+  background: radial-gradient(ellipse 120% 90% at center, var(--bg-2) 0%, var(--bg-0) 100%);
   opacity: 1;
-  transition: opacity 350ms ease;
+  transition: opacity 400ms ease;
 }
-.player__poster.is-hidden {
+.player__cover.is-hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+/* A soft grayscale light sweep — a subtle "powering-on" motion while loading.
+   No content, just a faint moving highlight over the dark plate. */
+.player__shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 38%,
+    rgba(242, 242, 242, 0.06) 50%,
+    transparent 62%
+  );
+  background-size: 220% 100%;
+  animation: player-shimmer 1.7s ease-in-out infinite;
+}
+
+@keyframes player-shimmer {
+  0%   { background-position: 160% 0; }
+  100% { background-position: -60% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player__shimmer { animation: none; }
 }
 
 .player__placeholder {

@@ -22,26 +22,36 @@
   border-bottom-color: var(--border);
 }
 
-.navbar__name {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--text-1);
-  letter-spacing: 0.02em;
+.navbar__logo {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
+  min-width: 44px;
+  margin-inline-start: -6px; /* optically align the glyph to the padding edge */
+  background: transparent;
+  cursor: pointer;
+}
+
+.navbar__logo-img {
+  display: block;
+  height: 34px;
+  width: auto;
+  /* Keep the white monogram legible over bright hero frames without a hard box. */
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.55));
 }
 
 .navbar__link {
-  font-size: 0.9375rem;
-  font-weight: 400;
-  color: var(--text-2);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-1);
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  transition: color var(--dur-fast) ease;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  transition: opacity var(--dur-fast) ease;
 }
 
 .navbar__link:hover {
-  color: var(--text-1);
+  opacity: 0.7;
 }
